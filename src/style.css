@@ -1,0 +1,261 @@
+:root {
+  --base: 220;
+  --hdr: hsl(calc(var(--base) - 1), 21%, 13%); /* Header Background Color */
+  --bkg: hsl(
+    var(--base),
+    20%,
+    9%
+  ); /* Background Color - Also located inside index.html <style> hard-coded */
+  --frg: hsl(var(--base), 20%, 17%); /* Foreground Color */
+  --hgl: hsl(calc(var(--base) - 10), 100%, 40%); /* Highlight Color */
+
+  --htx: #666; /* Header Text Color */
+  --txt: #a6a6a6; /* Text Color */
+
+  --max-links: 7;
+  --section-padding: 10px;
+  --link-text-height: 19.2px;
+  --link-margin: 5px;
+  --link-height: calc(var(--link-text-height) + var(--link-margin));
+
+  --section-height: calc(
+    calc(var(--max-links) + 1) * var(--link-height) + var(--section-padding)
+  );
+}
+
+@font-face {
+  /* LICENSE: "font/SIL Open Font License.txt" font by Julieta Ulanovsky */
+  src: url(font/Montserrat-Regular.otf);
+  font-family: Montserrat;
+}
+
+html,
+body {
+  font-family: Montserrat;
+  overflow-x: hidden;
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  display: relative;
+}
+
+/* Corner links styling */
+
+.left-corner {
+  position: absolute;
+  top: 5px;
+  left: 13px;
+}
+
+.right-corner {
+  position: absolute;
+  top: 5px;
+  right: 15px;
+}
+
+div#bottom-link-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.top-link {
+  text-decoration: none;
+  padding: 0.25em 0em;
+  color: var(--htx);
+}
+
+.top-link:hover {
+  color: var(--txt);
+}
+
+.top-link svg {
+  width: 1.3em;
+  height: 1.3em;
+  color: rgb(88, 88, 88);
+}
+
+.top-link svg:hover {
+  width: 1.3em;
+  height: 1.3em;
+  color: var(--txt);
+}
+
+@media only screen and (max-width: 1175px) {
+  .top-link {
+    font-size: 13px;
+  }
+
+  .left-corner {
+    top: 2px;
+  }
+
+  .right-corner {
+    top: 2px;
+  }
+}
+
+/* Search box styling */
+
+div#wiper {
+  opacity: 0 !important;
+  z-index: -1 !important;
+}
+
+body > div#root > div#main {
+  transform: translate(-50%, -50%);
+  text-align: center;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transition: 1s transform;
+  max-height: 90vh;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  transition: 0.2s height;
+  max-width: 912px;
+}
+
+body > div#root > div#main > span > div#static-links {
+  font-family: Terminus, Montserrat;
+  background-color: var(--hdr);
+  margin: 2px 2px 0px 2px;
+  box-sizing: border-box;
+  color: var(--txt) 22;
+  padding-right: 7px;
+  padding-left: 5px;
+  line-height: 30px;
+  text-align: right;
+  font-size: 16px;
+  border: none;
+  width: 908px;
+  height: 30px;
+}
+
+body > div#root > div#main > span > div#static-links > span#clock {
+  margin-right: 15px;
+}
+
+body > div#root > div#main > span > div#static-links > span:first-of-type {
+  color: var(--htx);
+  float: left;
+}
+
+body > div#root > div#main > span > div#static-links > a {
+  text-decoration: none;
+  color: var(--htx);
+}
+
+body > div#root > div#main > span > div#static-links > a:hover {
+  color: white;
+}
+
+body > div#root > div#main > span > div#static-links > a + a {
+  margin-left: 15px;
+}
+
+body >  div#root > div#main > span > form > input {
+  background-color: var(--frg);
+  font-family: Montserrat;
+  margin: 0px 2px 2px 2px;
+  box-sizing: border-box;
+  color: var(--txt);
+  padding-left: 5px;
+  font-size: 40px;
+  border: none;
+  width: 908px;
+  height: 50px;
+}
+
+body > div#root > div#main > span > form > input:focus {
+  outline: none;
+}
+
+@media screen and (max-width: 912px) {
+  body > div#root > div#main > span > form > input,
+  body >  div#root >div#main > span > div#static-links {
+    width: 604px;
+  }
+}
+
+@media screen and (max-width: 608px) {
+  body > div#root > div#main > span > form > input,
+  body > div#root > div#main > span > div#static-links {
+    width: 300px;
+  }
+}
+
+div#links > div.section {
+  background-color: var(--hdr);
+  box-sizing: border-box;
+  display: inline-block;
+  vertical-align: top;
+  text-align: left;
+  height: var(--section-height);
+  width: 300px;
+  margin: 2px;
+  overflow: hidden;
+  color: var(--htx);
+}
+
+div#links > div.section:before {
+  content: '';
+  margin-left: 5px;
+}
+
+div#links > div.section > div {
+  background-color: var(--frg);
+  height: 100%;
+}
+
+div#links > div.section > div > a {
+  text-decoration: none;
+  color: var(--txt);
+  display: block;
+}
+
+div#links > div.section > div > a:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--hgl);
+}
+
+div#links > div.section > div > a.selected {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--hgl);
+}
+
+div#links > div.section > div > a + a {
+  margin-top: var(--link-margin);
+}
+
+/* CSS from index.html */
+/* TODO: possibly remove most/all of these rules */
+
+:root {
+  --base: 220;
+  --bkg: hsl(var(--base), 20%, 9%);
+}
+
+body > div#root > div#main > span > div#static-links {
+  height: 30px;
+}
+
+body > div#root > div#main > span > form > input {
+  border: none;
+  height: 50px;
+}
+
+div#links > div.section > div {
+  padding: 15px;
+  padding-left: 10px;
+  padding-top: 10px;
+}
+
+body,
+html {
+  margin: 0;
+  background-color: var(--bkg);
+}

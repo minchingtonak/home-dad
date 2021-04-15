@@ -1,26 +1,19 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { useEffect } from 'react';
+import HomeSearch from './HomeSearch';
+import { PAGE_HUE_MAX, PAGE_HUE_MIN } from './config';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+export default function App() {
+  useEffect(() => {
+    function random(min: number, max: number): number {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // Choose a random page color scheme on page load
+    document.documentElement.style.setProperty(
+      '--base',
+      `${random(PAGE_HUE_MIN, PAGE_HUE_MAX)}`,
+    );
+  }, []);
+
+  return <HomeSearch />;
 }
-
-export default App;
