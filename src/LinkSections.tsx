@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import validator from 'validator';
-import { json, option } from './config';
+import { json, option, SITES_DATA_URL } from './config';
 
 function Section({
   title,
@@ -32,11 +32,21 @@ export default function LinkSections({
   const [totalMatched, setTotalMatched] = useState(0);
 
   useEffect(() => {
-    fetch(
-      'https://gist.githubusercontent.com/minchingtonak/b60356be980dc4f430fe73b523d1fafb/raw',
-    )
+    fetch(SITES_DATA_URL)
       .then((res) => res.json())
-      .then((data) => setSites(data))
+      .then((data) => {
+        setSites(data);
+        document.documentElement.style.setProperty(
+          '--max-links',
+          `${Object.keys(data)
+            .map((category) => data[category])
+            .reduce(
+              (prev, curr) =>
+                Math.max(Object.keys(curr).length, Object.keys(prev).length),
+              Object.keys(data[Object.keys(data)[0]]).length,
+            )}`,
+        );
+      })
       .catch((err) => console.error(err));
   }, []);
 

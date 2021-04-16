@@ -14,7 +14,7 @@
 
   --max-links: 7;
   --section-padding: 10px;
-  --link-text-height: 19.2px;
+  --link-text-height: 20px;
   --link-margin: 5px;
   --link-height: calc(var(--link-text-height) + var(--link-margin));
 
@@ -220,6 +220,7 @@ div#links > div.section > div > a {
   text-decoration: none;
   color: var(--txt);
   display: block;
+  margin-bottom: var(--link-margin);
 }
 
 div#links > div.section > div > a:hover {
@@ -230,8 +231,4 @@ div#links > div.section > div > a:hover {
 div#links > div.section > div > a.selected {
   background-color: rgba(255, 255, 255, 0.05);
   color: var(--hgl);
-}
-
-div#links > div.section > div > a + a {
-  margin-top: var(--link-margin);
 }
