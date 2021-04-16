@@ -31,10 +31,12 @@
 
 html,
 body {
+  background-color: var(--bkg);
   font-family: Montserrat;
   overflow-x: hidden;
   height: 100%;
   width: 100%;
+  margin: 0;
 }
 
 body {
@@ -157,7 +159,7 @@ body > div#root > div#main > span > div#static-links > a + a {
   margin-left: 15px;
 }
 
-body >  div#root > div#main > span > form > input {
+body > div#root > div#main > span > form > input {
   background-color: var(--frg);
   font-family: Montserrat;
   margin: 0px 2px 2px 2px;
@@ -176,7 +178,7 @@ body > div#root > div#main > span > form > input:focus {
 
 @media screen and (max-width: 912px) {
   body > div#root > div#main > span > form > input,
-  body >  div#root >div#main > span > div#static-links {
+  body > div#root > div#main > span > div#static-links {
     width: 604px;
   }
 }
@@ -209,6 +211,9 @@ div#links > div.section:before {
 div#links > div.section > div {
   background-color: var(--frg);
   height: 100%;
+  padding: 15px;
+  padding-left: 10px;
+  padding-top: 10px;
 }
 
 div#links > div.section > div > a {
@@ -229,33 +234,4 @@ div#links > div.section > div > a.selected {
 
 div#links > div.section > div > a + a {
   margin-top: var(--link-margin);
-}
-
-/* CSS from index.html */
-/* TODO: possibly remove most/all of these rules */
-
-:root {
-  --base: 220;
-  --bkg: hsl(var(--base), 20%, 9%);
-}
-
-body > div#root > div#main > span > div#static-links {
-  height: 30px;
-}
-
-body > div#root > div#main > span > form > input {
-  border: none;
-  height: 50px;
-}
-
-div#links > div.section > div {
-  padding: 15px;
-  padding-left: 10px;
-  padding-top: 10px;
-}
-
-body,
-html {
-  margin: 0;
-  background-color: var(--bkg);
 }

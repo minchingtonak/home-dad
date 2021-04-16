@@ -1,12 +1,12 @@
 export const PAGE_HUE_MIN = 10;
 export const PAGE_HUE_MAX = 360;
 
-// export interface None  {
-//     readonly _t: 'None';
-// }
-// export interface Some<T> {
-//     readonly _t: 'Some';
-//     value: T;
-// }
-// export type Option<T> = Some<T> | None;
+export const DEFAULT_TAB_TITLE = '🏠 Home';
+export const SEARCH_TAB_PREFIX = '🔍';
+export const NOTE_TAB_PREFIX = '📝';
+
+export const DEFAULT_SEARCH_URL = 'https://google.com/search';
+
 export type option<T> = T | null;
+export type json = { [k: string]: { [k: string]: string } };
+
