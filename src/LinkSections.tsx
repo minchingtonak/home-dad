@@ -38,13 +38,11 @@ export default function LinkSections({
         setSites(data);
         document.documentElement.style.setProperty(
           '--max-links',
-          `${Object.keys(data)
-            .map((category) => data[category])
-            .reduce(
-              (prev, curr) =>
-                Math.max(Object.keys(curr).length, Object.keys(prev).length),
-              Object.keys(data[Object.keys(data)[0]]).length,
-            )}`,
+          `${Math.max(
+            ...Object.keys(data).map(
+              (category) => Object.keys(data[category]).length,
+            ),
+          )}`,
         );
       })
       .catch((err) => console.error(err));
