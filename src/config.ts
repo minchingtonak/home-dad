@@ -11,4 +11,4 @@ export const SITES_DATA_URL =
   'https://gist.githubusercontent.com/minchingtonak/b60356be980dc4f430fe73b523d1fafb/raw';
 
 export type option<T> = T | null;
-export type json = { [k: string]: { [k: string]: string } };
+export type Sites = { [k: string]: { [k: string]: string } };
