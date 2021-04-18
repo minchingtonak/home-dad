@@ -56,8 +56,11 @@ export default function SearchBar({
       onSubmit={(e) => {
         e.preventDefault();
         // TODO - code to handle todo list commands
+        // We prefix action with '//' to indicate to the browser
+        // that it is a new root url and to find the protocol
+        // for us
         window.location.assign(
-          action !== null ? action : `${DEFAULT_SEARCH_URL}?q=${text}`,
+          action !== null ? `//${action}` : `${DEFAULT_SEARCH_URL}?q=${text}`,
         );
       }}
     >

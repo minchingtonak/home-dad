@@ -101,7 +101,7 @@ export default function LinkSections({
       query.match(/^localhost:\d{3,5}$/) !== null
     ) {
       setAction(
-        `http://localhost:${(query.match(/\d{3,5}/) as RegExpMatchArray)[0]}`,
+        `localhost:${(query.match(/\d{3,5}/) as RegExpMatchArray)[0]}`,
       );
       return;
     }
