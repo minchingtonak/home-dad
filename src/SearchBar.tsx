@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import {
   DEFAULT_SEARCH_URL,
   DEFAULT_TAB_TITLE,
@@ -16,6 +16,15 @@ export default function SearchBar({
   setText: (s: string) => void;
   action: option<string>;
 }) {
+  const input = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    // Clikcing on anything except a link will focus the search bar
+    (document.querySelector('body') as HTMLBodyElement).onclick = (e) => {
+      if (input && input.current) input.current.focus();
+    };
+  }, [input]);
+
   const updateTitle = useCallback(
     (start: string) => {
       if (text.length) document.title = `${start} - ${text}`;
@@ -55,6 +64,7 @@ export default function SearchBar({
       <input
         type="text"
         value={text}
+        ref={input}
         autoFocus
         autoComplete={'off'}
         onChange={(e) => setText(e.target.value)}
