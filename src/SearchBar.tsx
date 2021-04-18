@@ -6,6 +6,7 @@ import {
   option,
   SEARCH_TAB_PREFIX,
 } from './config';
+import { hasProtocol } from './util';
 
 export default function SearchBar({
   text,
@@ -60,7 +61,9 @@ export default function SearchBar({
         // that it is a new root url and to find the protocol
         // for us
         window.location.assign(
-          action !== null ? `//${action}` : `${DEFAULT_SEARCH_URL}?q=${text}`,
+          action !== null
+            ? `${hasProtocol(action) ? '' : '//'}${action}`
+            : `${DEFAULT_SEARCH_URL}?q=${text}`,
         );
       }}
     >

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import validator from 'validator';
 import { Sites, option, SITES_DATA_URL } from './config';
+import { hasProtocol } from './util';
 
 function Section({
   title,
@@ -72,7 +73,9 @@ export default function LinkSections({
                 return (
                   <a
                     key={idx}
-                    href={`//${links[name]}`}
+                    href={`${hasProtocol(links[name]) ? '' : '//'}${
+                      links[name]
+                    }`}
                     className={isSelected ? 'selected' : ''}
                   >
                     {name}
@@ -100,9 +103,7 @@ export default function LinkSections({
       query.match(/^lh\d{3,5}$/) !== null ||
       query.match(/^localhost:\d{3,5}$/) !== null
     ) {
-      setAction(
-        `localhost:${(query.match(/\d{3,5}/) as RegExpMatchArray)[0]}`,
-      );
+      setAction(`localhost:${(query.match(/\d{3,5}/) as RegExpMatchArray)[0]}`);
       return;
     }
     // Assemble list of sections based on query
