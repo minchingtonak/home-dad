@@ -72,7 +72,7 @@ export default function LinkSections({
                 return (
                   <a
                     key={idx}
-                    href={links[name]}
+                    href={`//${links[name]}`}
                     className={isSelected ? 'selected' : ''}
                   >
                     {name}
