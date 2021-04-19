@@ -1,4 +1,4 @@
 
-export function hasProtocol(s: string): boolean {
-    return s.match(/^https?:\/\//) !== null;
+export function getValidURL(link: string): string {
+    return link.match(/^https?:\/\//) !== null ? link : `//${link}`;
 }

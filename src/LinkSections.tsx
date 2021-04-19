@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import validator from 'validator';
 import { Sites, option, SITES_DATA_URL } from './config';
-import { hasProtocol } from './util';
+import { getValidURL } from './util';
 
 function Section({
   title,
@@ -73,9 +73,7 @@ export default function LinkSections({
                 return (
                   <a
                     key={idx}
-                    href={`${hasProtocol(links[name]) ? '' : '//'}${
-                      links[name]
-                    }`}
+                    href={getValidURL(links[name])}
                     className={isSelected ? 'selected' : ''}
                   >
                     {name}

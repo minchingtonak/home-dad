@@ -6,7 +6,7 @@ import {
   option,
   SEARCH_TAB_PREFIX,
 } from './config';
-import { hasProtocol } from './util';
+import { getValidURL } from './util';
 
 export default function SearchBar({
   text,
@@ -62,7 +62,7 @@ export default function SearchBar({
         // for us
         window.location.assign(
           action !== null
-            ? `${hasProtocol(action) ? '' : '//'}${action}`
+            ? getValidURL(action)
             : `${DEFAULT_SEARCH_URL}?q=${text}`,
         );
       }}
