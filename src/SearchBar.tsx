@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   DEFAULT_SEARCH_URL,
   DEFAULT_TAB_TITLE,
@@ -51,16 +51,31 @@ export default function SearchBar({
     };
   }, [updateTitle]);
 
+  const [ctrlPressed, setCtrlPressed] = useState(false);
+
+  useEffect(() => {
+    function toggle(e: KeyboardEvent) {
+      if (e.key === 'Control') setCtrlPressed(!ctrlPressed);
+    }
+    document.addEventListener('keydown', toggle);
+    document.addEventListener('keyup', toggle);
+
+    return () => {
+      document.removeEventListener('keydown', toggle);
+      document.removeEventListener('keyup', toggle);
+    };
+  }, [ctrlPressed]);
+
   return (
     <form
       id={'action'}
       onSubmit={(e) => {
         e.preventDefault();
         // TODO - code to handle todo list commands
-        // We prefix action with '//' to indicate to the browser
-        // that it is a new root url and to find the protocol
-        // for us
-        window.location.assign(
+        const travelTo = ctrlPressed
+          ? window.open
+          : window.location.assign.bind(window.location);
+        travelTo(
           action !== null
             ? getValidURL(action)
             : `${DEFAULT_SEARCH_URL}?q=${text}`,
