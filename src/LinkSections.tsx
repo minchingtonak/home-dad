@@ -101,7 +101,9 @@ export default function LinkSections({
       query.match(/^lh\d{3,5}$/) !== null ||
       query.match(/^localhost:\d{3,5}$/) !== null
     ) {
-      setAction(`localhost:${(query.match(/\d{3,5}/) as RegExpMatchArray)[0]}`);
+      setAction(
+        `http://localhost:${(query.match(/\d{3,5}/) as RegExpMatchArray)[0]}`,
+      );
       return;
     }
     // Assemble list of sections based on query
