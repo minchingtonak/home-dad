@@ -46,7 +46,7 @@ export default function LinkSections({
           )}`,
         );
       })
-      .catch((err) => console.error(err));
+      .catch((err) => console.log(err));
   }, []);
 
   const updateSections = useCallback(

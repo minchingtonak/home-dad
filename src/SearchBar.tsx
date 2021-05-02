@@ -19,12 +19,12 @@ export default function SearchBar({
 }) {
   const input = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    // Clikcing on anything except a link will focus the search bar
-    (document.querySelector('body') as HTMLBodyElement).onclick = (e) => {
-      if (input && input.current) input.current.focus();
-    };
-  }, [input]);
+  // useEffect(() => {
+  //   // Clikcing on anything except a link will focus the search bar
+  //   (document.querySelector('body') as HTMLBodyElement).onclick = (e) => {
+  //     if (input && input.current) input.current.focus();
+  //   };
+  // }, [input]);
 
   const updateTitle = useCallback(
     (start: string) => {

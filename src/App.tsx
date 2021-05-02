@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import HomeSearch from './HomeSearch';
 import { PAGE_HUE_MAX, PAGE_HUE_MIN } from './config';
+import { HomeTasks } from './HomeTasks';
 
 export default function App() {
   useEffect(() => {
@@ -15,5 +16,11 @@ export default function App() {
     );
   }, []);
 
-  return <HomeSearch />;
+  return (
+    <>
+      <HomeSearch />
+      <div style={{ padding: 30 }}></div>
+      <HomeTasks />
+    </>
+  );
 }

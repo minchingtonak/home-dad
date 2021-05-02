@@ -105,12 +105,119 @@ div#wiper {
   z-index: -1 !important;
 }
 
-body > div#root > div#main {
-  transform: translate(-50%, -50%);
+body > div#root {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Home Tasks */
+
+body > div#root > div#tasksmain {
+  order: 1;
+  width: fit-content;
+}
+
+body > div#root > div#tasksmain > div#tasksbar {
+  padding: 5px;
+  font-size: 30px;
+  color: var(--htx);
+  background-color: var(--hdr);
+  display: flex;
+  align-items: center;
+}
+
+body > div#root > div#tasksmain > div#taskslist {
+  height: 100%;
+  width: 100%;
+  padding-top: 5px;
+  background-color: var(--frg);
+  height: 403px; /* fix magic number later */
+  color: var(--htx);
   text-align: center;
-  position: absolute;
-  left: 50%;
-  top: 50%;
+  overflow: auto;
+}
+
+body > div#root > div#tasksmain > div#taskslist > div {
+  margin-bottom: 5px;
+  margin-left: 5px;
+  margin-right: 5px;
+  padding: 5px;
+  color: var(--txt);
+  background-color: var(--hdr);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  /* flex-wrap: wrap; */
+}
+
+body > div#root > div#tasksmain > div#taskslist > div > input {
+  order: 0;
+  margin: 10px;
+  margin-left: 7px;
+}
+
+body > div#root > div#tasksmain > div#taskslist > div > div {
+  order: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+body > div#root > div#tasksmain > div#taskslist > div > .fa-trash {
+  order: 2;
+  padding: 10px;
+}
+
+body > div#root > div#tasksmain > div#taskslist > div > div > input#desc {
+  order: 0;
+  background-color: inherit;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  border: 0;
+  border-bottom: 2px solid var(--htx);
+  margin: 5px;
+}
+
+body > div#root > div#tasksmain > div#taskslist > div > div > span#due {
+  order: 1;
+  margin: 5px;
+  display: flex;
+  align-content: flex-start;
+  align-items: center;
+}
+
+body
+  > div#root
+  > div#tasksmain
+  > div#taskslist
+  > div
+  > div
+  > span#due
+  > .fa-clock {
+  margin: 5px;
+}
+
+body > div#root > div#tasksmain > div#taskslist > div > div > span#due > input {
+  background-color: inherit;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  border: 0;
+  border-bottom: 2px solid var(--htx);
+  margin: 5px;
+}
+
+/* Home Search */
+
+body > div#root > div#main {
+  order: 0;
+  text-align: center;
+  position: relative;
   transition: 1s transform;
   max-height: 90vh;
   -webkit-user-select: none;
