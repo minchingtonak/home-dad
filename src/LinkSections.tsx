@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import validator from 'validator';
 import { Sites, option, SITES_DATA_URL } from './config';
-import { getValidURL } from './util';
+import { getValidURL } from './utils';
 
 function Section({
   title,

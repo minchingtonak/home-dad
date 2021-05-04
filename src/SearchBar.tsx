@@ -6,7 +6,7 @@ import {
   option,
   SEARCH_TAB_PREFIX,
 } from './config';
-import { getValidURL } from './util';
+import { getValidURL } from './utils';
 
 export default function SearchBar({
   text,

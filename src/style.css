@@ -117,6 +117,8 @@ body > div#root {
 
 /* Home Tasks */
 
+
+
 body > div#root > div#tasksmain {
   order: 1;
   width: fit-content;
@@ -153,6 +155,11 @@ body > div#root > div#tasksmain > div#taskslist > div {
   flex-direction: row;
   align-items: center;
   /* flex-wrap: wrap; */
+}
+
+body > div#root > div#tasksmain > div#taskslist > p {
+  padding: 30px;
+  color: var(--htx);
 }
 
 body > div#root > div#tasksmain > div#taskslist > div > input {
@@ -199,16 +206,6 @@ body
   > div
   > span#due
   > .fa-clock {
-  margin: 5px;
-}
-
-body > div#root > div#tasksmain > div#taskslist > div > div > span#due > input {
-  background-color: inherit;
-  color: inherit;
-  font-family: inherit;
-  font-size: inherit;
-  border: 0;
-  border-bottom: 2px solid var(--htx);
   margin: 5px;
 }
 

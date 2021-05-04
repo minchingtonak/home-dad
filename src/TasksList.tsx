@@ -1,15 +1,179 @@
 import {
   Task,
-  TaskOptions,
   TASKS_API_URL,
   TASK_DELETE_DELAY,
   TASK_UPDATE_DELAY,
 } from './config';
 import update from 'immutability-helper';
-import { ChangeEventHandler, useEffect, useState } from 'react';
-import 'react-modern-calendar-datepicker/lib/DatePicker.css';
-import DatePicker, { Day, DayValue } from 'react-modern-calendar-datepicker';
-import dayjs from 'dayjs';
+import {
+  CheckboxProps,
+  Checkbox,
+  InputProps,
+  Input,
+  ThemeProvider,
+  withStyles,
+  createMuiTheme,
+} from '@material-ui/core';
+import {
+  DateTimePicker,
+  DateTimePickerProps,
+  MuiPickersUtilsProvider,
+} from '@material-ui/pickers';
+import DayJsUtils from '@date-io/dayjs';
+import { ChangeEventHandler, useState } from 'react';
+// import {
+//   HomeCheckbox,
+//   HomeDateTimePicker,
+//   HomeInput,
+// } from './utils';
+
+export const HomeCheckbox = withStyles(
+  {
+    root: {
+      color: '#a6a6a6',
+      '&$checked': {
+        color: '#a6a6a6',
+      },
+    },
+    checked: {},
+  },
+  { index: 1 },
+)((props: CheckboxProps) => <Checkbox color="default" {...props} />);
+
+export const inputStyles = {
+  root: {
+    color: '#a6a6a6',
+  },
+  underline: {
+    '&:before': {
+      borderBottom: '1px solid #a6a6a6',
+    },
+    '&:hover:not($disabled):not($focused):not($error):before': {
+      borderBottom: '2px solid #a6a6a6',
+    },
+    '&:after': {
+      borderBottom: '3px solid #a6a6a6',
+    },
+  },
+  disabled: {},
+  focused: {},
+  error: {},
+};
+
+export const dateTimePickerTheme = createMuiTheme({
+  overrides: {
+    MuiInput: inputStyles,
+    MuiPaper: {
+      root: {
+        border: '3px solid var(--frg)',
+      },
+      rounded: {
+        borderRadius: '0',
+        backgroundColor: 'var(--frg)',
+      },
+    },
+    MuiPickersToolbar: {
+      toolbar: {
+        backgroundColor: 'var(--hdr)',
+      },
+    },
+    MuiPickersCalendarHeader: {
+      iconButton: {
+        backgroundColor: 'var(--hdr)',
+        color: 'var(--txt)',
+        margin: '0 5px',
+      },
+      switchHeader: {
+        backgroundColor: 'var(--frg)',
+        color: 'var(--txt)',
+      },
+      daysHeader: {
+        backgroundColor: 'var(--frg)',
+      },
+      dayLabel: {
+        color: 'var(--txt)',
+      },
+    },
+    MuiPickersDay: {
+      day: {
+        color: 'var(--txt)',
+        backgroundColor: 'var(--frg)',
+        '&:hover': {
+          backgroundColor: 'rgba(255, 255, 255, 0.1)',
+        },
+      },
+      daySelected: {
+        backgroundColor: 'var(--htx)',
+        '&:hover': {
+          backgroundColor: 'var(--txt)',
+        },
+      },
+      dayDisabled: {
+        color: 'var(--htx)',
+      },
+      current: {
+        color: 'var(--txt)',
+      },
+    },
+    MuiPickersModal: {
+      dialogAction: {
+        color: 'red',
+      },
+    },
+    MuiPickersClock: {
+      clock: {
+        backgroundColor: 'var(--hdr)',
+      },
+      pin: {
+        backgroundColor: 'var(--htx)',
+      },
+    },
+    MuiPickersClockNumber: {
+      clockNumber: {
+        color: 'var(--txt)',
+      },
+      clockNumberSelected: {
+        backgroundColor: 'var(--htx)',
+      },
+    },
+    MuiPickersClockPointer: {
+      pointer: {
+        backgroundColor: 'var(--htx)',
+      },
+      thumb: {
+        borderColor: '#00000000',
+      },
+      noPoint: {
+        backgroundColor: '#00000000',
+      },
+    },
+    MuiPickersYear: {
+      root: {
+        color: 'var(--htx)',
+      },
+      yearSelected: {
+        color: 'var(--txt)',
+      },
+    },
+  },
+});
+
+export const HomeInput = withStyles(
+  {
+    ...inputStyles,
+  },
+  { index: 1 },
+)((props: InputProps) => <Input {...props} />);
+
+export function HomeDateTimePicker(props: DateTimePickerProps) {
+  return (
+    <MuiPickersUtilsProvider utils={DayJsUtils}>
+      <ThemeProvider theme={dateTimePickerTheme}>
+        <DateTimePicker {...props} />
+      </ThemeProvider>
+    </MuiPickersUtilsProvider>
+  );
+}
 
 function TaskEntry({
   task,
@@ -19,44 +183,35 @@ function TaskEntry({
   setDeleted,
 }: {
   task: Task;
-  setTask: (t: TaskOptions) => void;
+  setTask: (t: Partial<Task>) => void;
   checked: boolean;
   setChecked: ChangeEventHandler;
   setDeleted: () => void;
 }) {
-  const [day, setDay] = useState<DayValue>(null);
-
-  useEffect(() => {
-    const d = new Date(task.due);
-    setDay({ year: d.getFullYear(), month: d.getMonth(), day: d.getDate() });
-  }, [task]);
-
-  function toDate(d: Day, t: number) {
-    return new Date(d.year, d.month - 1, d.day);
-  }
-
   return (
     <div>
-      <input type="checkbox" checked={checked} onChange={setChecked} />
+      <HomeCheckbox checked={checked} onChange={setChecked} />
       <div>
-        <input
-          id="desc"
+        <HomeInput
+          error={task.text === ''}
           value={task.text}
-          onChange={(e) => {
-            setTask({ text: e.target.value });
-          }}
+          onChange={(e) => setTask({ text: e.target.value })}
         />
         <span id="due">
           <i className="fas fa-clock"></i>
-          <input
-            readOnly
-            className="date-picker-input"
-            value={
-              day
-                ? dayjs(toDate(day, 0)).format('ddd, MMM D [at H:mm]')
-                : 'choose a date'
-            }
-          />
+          <MuiPickersUtilsProvider utils={DayJsUtils}>
+            <ThemeProvider theme={dateTimePickerTheme}>
+              <DateTimePicker
+                variant="inline"
+                autoOk
+                ampm={false}
+                hideTabs={true}
+                value={task.due}
+                format={'ddd, MMM D [at] H:mm'}
+                onChange={(d) => setTask({ due: d?.toDate() })}
+              />
+            </ThemeProvider>
+          </MuiPickersUtilsProvider>
         </span>
       </div>
       <i className="fas fa-trash fa-lg" onClick={setDeleted}></i>
@@ -72,11 +227,11 @@ export function TasksList({
   setTasks: (t: Task[]) => void;
 }) {
   const [updateTimer, setUpdateTimer] = useState<number | undefined>(undefined);
-  const [toBeUpdated, setToBeUpdated] = useState<{ [k: string]: TaskOptions }>(
-    {},
-  );
+  const [toBeUpdated, setToBeUpdated] = useState<{
+    [k: string]: Partial<Task>;
+  }>({});
 
-  function updateTask(idx: number, t: TaskOptions) {
+  function updateTask(idx: number, t: Partial<Task>) {
     // update local tasks list
     const updated = update(tasks, {
       [idx]: { $merge: t },
@@ -96,6 +251,8 @@ export function TasksList({
 
     // reset countdown to sending update data
     clearTimeout(updateTimer);
+
+    if (updatedTask.text === '') return;
     setUpdateTimer(
       window.setTimeout(() => {
         fetch(TASKS_API_URL, {
@@ -163,18 +320,21 @@ export function TasksList({
   return (
     <div id="taskslist">
       {tasks.length ? (
-        tasks.map((task, idx) => (
-          <TaskEntry
-            key={idx}
-            task={task}
-            setTask={updateTask.bind(null, idx)}
-            checked={tasks[idx].completed}
-            setChecked={updateTask.bind(null, idx, {
-              completed: !tasks[idx].completed,
-            })}
-            setDeleted={deleteTask.bind(null, idx)}
-          />
-        ))
+        tasks
+          // .filter((t) => !t.completed)
+          // .sort((a, b) => new Date(a.due).getTime() - new Date(b.due).getTime())
+          .map((task, idx) => (
+            <TaskEntry
+              key={idx}
+              task={task}
+              setTask={updateTask.bind(null, idx)}
+              checked={tasks[idx].completed}
+              setChecked={updateTask.bind(null, idx, {
+                completed: !tasks[idx].completed,
+              })}
+              setDeleted={deleteTask.bind(null, idx)}
+            />
+          ))
       ) : (
         <p>Looks like you have some free time :)</p>
       )}
