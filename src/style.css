@@ -117,8 +117,6 @@ body > div#root {
 
 /* Home Tasks */
 
-
-
 body > div#root > div#tasksmain {
   order: 1;
   width: fit-content;
@@ -144,7 +142,7 @@ body > div#root > div#tasksmain > div#taskslist {
   overflow: auto;
 }
 
-body > div#root > div#tasksmain > div#taskslist > div {
+body > div#root > div#tasksmain > div#taskslist > div.taskentry {
   margin-bottom: 5px;
   margin-left: 5px;
   margin-right: 5px;
@@ -153,7 +151,7 @@ body > div#root > div#tasksmain > div#taskslist > div {
   background-color: var(--hdr);
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: flex-start;
   /* flex-wrap: wrap; */
 }
 
@@ -168,15 +166,53 @@ body > div#root > div#tasksmain > div#taskslist > div > input {
   margin-left: 7px;
 }
 
+body > div#root > div#tasksmain > div#taskslist > div#completedtasks {
+  padding: 5px;
+  margin: 5px;
+  margin-top: 0;
+}
+
+body > div#root > div#tasksmain > div#taskslist > div#completedtasks {
+  padding: 5px;
+  color: var(--htx);
+}
+
+body > div#root > div#tasksmain > div#taskslist > div#completedtasks > hr {
+  background-color: var(--htx);
+  border-width: 0;
+  height: 1px;
+}
+
+body > div#root > div#tasksmain > div#taskslist > div#completedtasks:hover {
+  color: var(--txt)
+}
+
+body > div#root > div#tasksmain > div#taskslist > div#completedtasks:hover > hr {
+  background-color: var(--txt);
+}
+
+body > div#root > div#tasksmain > div#taskslist > div#completedtasks > i.fa-chevron-right {
+  margin-right: 7px;
+}
+
+body > div#root > div#tasksmain > div#taskslist > div#completedtasks > i.fa-chevron-down {
+  margin-right: 3px;
+}
+
+body > div#root > div#tasksmain > div#taskslist > div#completedtasks > span {
+  align-self: flex-end;
+}
+
 body > div#root > div#tasksmain > div#taskslist > div > div {
   order: 1;
   display: flex;
   flex-direction: column;
 }
 
-body > div#root > div#tasksmain > div#taskslist > div > .fa-trash {
+body > div#root > div#tasksmain > div#taskslist > div > .fa-trash-alt {
   order: 2;
   padding: 10px;
+  align-self: center;
 }
 
 body > div#root > div#tasksmain > div#taskslist > div > div > input#desc {
@@ -193,20 +229,16 @@ body > div#root > div#tasksmain > div#taskslist > div > div > input#desc {
 body > div#root > div#tasksmain > div#taskslist > div > div > span#due {
   order: 1;
   margin: 5px;
+  margin-right: 0;
   display: flex;
   align-content: flex-start;
   align-items: center;
 }
 
-body
-  > div#root
-  > div#tasksmain
-  > div#taskslist
-  > div
-  > div
-  > span#due
-  > .fa-clock {
+body > div#root > div#tasksmain > div#taskslist > div > div > span#due > i {
   margin: 5px;
+  margin-left: 0;
+  color: var(--htx);
 }
 
 /* Home Search */
