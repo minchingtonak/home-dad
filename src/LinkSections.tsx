@@ -20,6 +20,8 @@ function Section({
   );
 }
 
+const ls = window.localStorage;
+
 export default function LinkSections({
   query,
   setAction,
@@ -27,16 +29,21 @@ export default function LinkSections({
   query: string;
   setAction: (s: option<string>) => void;
 }) {
-  const [sites, setSites] = useState<option<Sites>>(null);
+  const [sites, setSites] = useState<option<Sites>>(() => {
+    const cached = ls.getItem('sites');
+    return cached !== null ? JSON.parse(cached) : null;
+  });
   const [sections, setSections] = useState<JSX.Element[]>([]);
   const [selected, setSelected] = useState<option<number>>(null);
   const [totalMatched, setTotalMatched] = useState(0);
 
   useEffect(() => {
     fetch(SITES_DATA_URL)
-      .then((res) => res.json())
-      .then((data) => {
+      .then((res) => res.text())
+      .then((text) => {
+        const data = JSON.parse(text);
         setSites(data);
+        ls.setItem('sites', text);
         document.documentElement.style.setProperty(
           '--max-links',
           `${Math.max(
