@@ -12,6 +12,10 @@
   --htx: #666; /* Header Text Color */
   --txt: #a6a6a6; /* Text Color */
 
+  --lwidth: 908px;
+  --mwidth: 604px;
+  --swidth: 300px;
+
   --max-links: 7;
   --section-padding: 10px;
   --link-text-height: 20px;
@@ -105,7 +109,7 @@ div#wiper {
   z-index: -1 !important;
 }
 
-body > div#root {
+div#root {
   width: 100%;
   height: 100%;
   display: flex;
@@ -243,7 +247,7 @@ body > div#root > div#tasksmain > div#taskslist > div > div > span#due > i {
 
 /* Home Search */
 
-body > div#root > div#main {
+/* body > div#root > div#main {
   order: 0;
   text-align: center;
   position: relative;
@@ -255,9 +259,9 @@ body > div#root > div#main {
   user-select: none;
   transition: 0.2s height;
   max-width: 912px;
-}
+} */
 
-body > div#root > div#main > span > div#static-links {
+/* body > div#root > div#main > span > div#static-links {
   font-family: Terminus, Montserrat;
   background-color: var(--hdr);
   margin: 2px 2px 0px 2px;
@@ -271,31 +275,31 @@ body > div#root > div#main > span > div#static-links {
   border: none;
   width: 908px;
   height: 30px;
-}
+} */
 
-body > div#root > div#main > span > div#static-links > span#clock {
+/* body > div#root > div#main > span > div#static-links > span#clock {
   margin-right: 15px;
-}
+} */
 
-body > div#root > div#main > span > div#static-links > span:first-of-type {
+/* body > div#root > div#main > span > div#static-links > span:first-of-type {
   color: var(--htx);
   float: left;
-}
+} */
 
-body > div#root > div#main > span > div#static-links > a {
+/* body > div#root > div#main > span > div#static-links > a {
   text-decoration: none;
   color: var(--htx);
-}
+} */
 
-body > div#root > div#main > span > div#static-links > a:hover {
-  color: white;
-}
+/* body > div#root > div#main > span > div#static-links > a:hover {
+  color: var(--txt);
+} */
 
-body > div#root > div#main > span > div#static-links > a + a {
+/* body > div#root > div#main > span > div#static-links > a + a {
   margin-left: 15px;
-}
+} */
 
-body > div#root > div#main > span > form > input {
+/* body > div#root > div#main > span > form > input {
   background-color: var(--frg);
   font-family: Montserrat;
   margin: 0px 2px 2px 2px;
@@ -306,13 +310,13 @@ body > div#root > div#main > span > form > input {
   border: none;
   width: 908px;
   height: 50px;
-}
+} */
 
-body > div#root > div#main > span > form > input:focus {
+/* body > div#root > div#main > span > form > input:focus {
   outline: none;
-}
+} */
 
-@media screen and (max-width: 912px) {
+/* @media screen and (max-width: 912px) {
   body > div#root > div#main > span > form > input,
   body > div#root > div#main > span > div#static-links {
     width: 604px;
@@ -324,9 +328,9 @@ body > div#root > div#main > span > form > input:focus {
   body > div#root > div#main > span > div#static-links {
     width: 300px;
   }
-}
+} */
 
-div#links > div.section {
+/* div#links > div.section {
   background-color: var(--hdr);
   box-sizing: border-box;
   display: inline-block;
@@ -337,29 +341,30 @@ div#links > div.section {
   margin: 2px;
   overflow: hidden;
   color: var(--htx);
-}
+} */
 
-div#links > div.section:before {
+/* div#links > div.section:before {
   content: '';
   margin-left: 5px;
-}
+} */
 
-div#links > div.section > div {
+/* div#links > div.section > div {
   background-color: var(--frg);
   height: 100%;
   padding: 15px;
   padding-left: 10px;
   padding-top: 10px;
-}
+} */
 
-div#links > div.section > div > a {
+/* div#links > div.section > div > a {
   text-decoration: none;
+  padding-left: 5px;
   color: var(--txt);
   display: block;
   margin-bottom: var(--link-margin);
-}
+} */
 
-div#links > div.section > div > a:hover {
+/* div#links > div.section > div > a:hover {
   background-color: rgba(255, 255, 255, 0.05);
   color: var(--hgl);
 }
@@ -367,4 +372,4 @@ div#links > div.section > div > a:hover {
 div#links > div.section > div > a.selected {
   background-color: rgba(255, 255, 255, 0.05);
   color: var(--hgl);
-}
+} */

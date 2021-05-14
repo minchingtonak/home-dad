@@ -7,6 +7,36 @@ import {
   SEARCH_TAB_PREFIX,
 } from './config';
 import { getValidURL } from './utils';
+import styled from "styled-components";
+
+const SearchInput = styled.input`
+  margin: 0px 2px 2px 2px;
+  box-sizing: border-box;
+
+  border: none;
+  width: var(--lwidth);
+  height: 50px;
+
+  font-size: 40px;
+  background-color: var(--frg);
+  color: var(--txt);
+
+  &:focus {
+    outline: none;
+  }
+
+  @media screen and (max-width: 912px) {
+    & {
+      width: var(--mwidth);
+    }
+  }
+
+  @media screen and (max-width: 608px) {
+    & {
+      width: var(--swidth);
+    }
+  }
+`;
 
 export default function SearchBar({
   text,
@@ -82,12 +112,12 @@ export default function SearchBar({
         );
       }}
     >
-      <input
+      <SearchInput
         type="text"
         value={text}
         ref={input}
         autoFocus
-        autoComplete={'off'}
+        autoComplete="off"
         onChange={(e) => setText(e.target.value)}
       />
     </form>
