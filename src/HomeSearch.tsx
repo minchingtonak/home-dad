@@ -15,10 +15,6 @@ const MainContainer = styled.div`
   text-align: center;
 `;
 
-const Wrapper = styled.span`
-  display: block;
-`;
-
 export default function HomeSearch() {
   const [query, setQuery] = useState('');
   const [action, setAction] = useState<option<string>>(null);

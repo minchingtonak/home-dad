@@ -3,6 +3,22 @@ import { Task, TASKS_API_URL } from './config';
 import { TasksBar } from './TasksBar';
 import { TasksList } from './TasksList';
 import { useCached } from './utils';
+import styled from 'styled-components';
+
+const TasksMainDiv = styled.div`
+  width: var(--section-width);
+  height: var(--homesearch-height);
+
+  display: flex;
+  flex-direction: column;
+
+  @media screen and (max-width: 608px) {
+    & {
+      height: min-content;
+      margin: 0 0 20px 0;
+    }
+  }
+`;
 
 export function HomeTasks() {
   const [tasks, setTasks] = useCached<Task[]>('tasks', []);
@@ -23,7 +39,7 @@ export function HomeTasks() {
   }, [setCompleted]);
 
   return (
-    <div id="tasksmain">
+    <TasksMainDiv id="tasksmain">
       <TasksBar setTasks={setTasks} />
       <TasksList
         tasks={tasks}
@@ -31,6 +47,6 @@ export function HomeTasks() {
         completed={completed}
         setCompleted={setCompleted}
       />
-    </div>
+    </TasksMainDiv>
   );
 }

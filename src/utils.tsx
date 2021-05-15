@@ -31,7 +31,7 @@ const ls = window.localStorage;
 
 export function useCached<T>(
   key: string,
-  fallback: any,
+  fallback: T,
 ): [T, Dispatch<SetStateAction<T>>] {
   const [data, setData] = useState<T>(() => {
     const cached = ls.getItem(key);
@@ -181,9 +181,12 @@ export const dateTimePickerTheme = createMuiTheme({
   },
 });
 
-export const HomeInput = withStyles(inputStyles('var(--txt)', 'var(--txt)'), {
-  index: 1,
-})((props: InputProps) => <Input {...props} />);
+export const HomeMaterialInput = withStyles(
+  inputStyles('var(--txt)', 'var(--txt)'),
+  {
+    index: 1,
+  },
+)((props: InputProps) => <Input {...props} />);
 
 export function HomeDateTimePicker(props: DateTimePickerProps) {
   return (

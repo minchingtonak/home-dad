@@ -5,23 +5,55 @@ import {
   TASK_UPDATE_DELAY,
 } from './config';
 import update from 'immutability-helper';
-// import {
-//   CheckboxProps,
-//   Checkbox,
-//   InputProps,
-//   Input,
-//   ThemeProvider,
-//   withStyles,
-//   createMuiTheme,
-// } from '@material-ui/core';
-// import {
-//   DateTimePicker,
-//   DateTimePickerProps,
-//   MuiPickersUtilsProvider,
-// } from '@material-ui/pickers';
-// import DayJsUtils from '@date-io/dayjs';
 import { useState } from 'react';
-import { HomeCheckbox, HomeDateTimePicker, HomeInput, partial } from './utils';
+import {
+  HomeCheckbox,
+  HomeDateTimePicker,
+  HomeMaterialInput,
+  partial,
+} from './utils';
+import styled from 'styled-components';
+
+const TaskEntryDiv = styled.div`
+  margin: 0 5px 5px 5px;
+  padding: 0 0 5px 0;
+
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+
+  background-color: var(--hdr);
+
+  color: var(--txt);
+`;
+
+const TaskDescInput = styled(HomeMaterialInput)`
+  margin: 10px 10px 10px 7px;
+`;
+
+const TaskUIDiv = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const TrashIcon = styled.i.attrs({ className: 'far fa-trash-alt fa-lg' })`
+  padding: 10px;
+
+  align-self: center;
+`;
+
+const DueDateDiv = styled.div`
+  margin-right: 0;
+
+  display: flex;
+  align-content: flex-start;
+  align-items: center;
+`;
+
+const DueIcon = styled.i.attrs({ className: 'far fa-clock' })`
+  margin: 5px 5px 5px 0;
+  color: var(--htx);
+`;
 
 function TaskEntry({
   task,
@@ -35,17 +67,17 @@ function TaskEntry({
   setDeleted: () => void;
 }) {
   return (
-    <div className="taskentry">
+    <TaskEntryDiv className="taskentry">
       <HomeCheckbox checked={task.completed} onChange={setChecked} />
-      <div>
-        <HomeInput
+      <TaskUIDiv>
+        <TaskDescInput
           error={task.text === ''}
           value={task.text}
           style={{ fontSize: 'large' }}
           onChange={(e) => setTask({ text: e.target.value })}
         />
-        <span id="due">
-          <i className="far fa-clock"></i>
+        <DueDateDiv>
+          <DueIcon />
           <HomeDateTimePicker
             variant="inline"
             autoOk
@@ -55,12 +87,50 @@ function TaskEntry({
             format={'dddd, MMM D [at] H:mm'}
             onChange={(d) => setTask({ due: d?.toDate() })}
           />
-        </span>
-      </div>
-      <i className="far fa-trash-alt fa-lg" onClick={setDeleted}></i>
-    </div>
+        </DueDateDiv>
+      </TaskUIDiv>
+      <TrashIcon onClick={setDeleted} />
+    </TaskEntryDiv>
   );
 }
+
+const CompletedTasksDiv = styled.div`
+  padding: 5px;
+  margin: 0 5px 5px 5px;
+
+  color: var(--htx);
+
+  &:hover {
+    color: var(--txt);
+    hr {
+      background-color: var(--txt);
+    }
+  }
+`;
+
+const StyledHR = styled.hr`
+  height: 1px;
+
+  border-width: 0;
+
+  background-color: var(--htx);
+`;
+
+type ChevronIconProps = {
+  expanded: boolean;
+};
+
+const ChevronIcon = styled.i.attrs<ChevronIconProps>(({ expanded }) => ({
+  className: `fas fa-chevron-${expanded ? 'down' : 'right'}`,
+}))<ChevronIconProps>`
+  &.fa-chevron-right {
+    margin-right: 7px;
+  }
+
+  &.fa-chevron-down {
+    margin-right: 3px;
+  }
+`;
 
 function CompletedTasks({
   tasks,
@@ -77,15 +147,14 @@ function CompletedTasks({
 
   return (
     <>
-      <div id="completedtasks" onClick={partial(setExpanded, !expanded)}>
-        <hr />
-        {expanded ? (
-          <i className="fas fa-chevron-down" />
-        ) : (
-          <i className="fas fa-chevron-right" />
-        )}
+      <CompletedTasksDiv
+        id="completedtasks"
+        onClick={partial(setExpanded, !expanded)}
+      >
+        <StyledHR />
+        <ChevronIcon expanded={expanded} />
         <span>Completed tasks</span>
-      </div>
+      </CompletedTasksDiv>
       {expanded
         ? tasks.map((task, idx) => (
             <TaskEntry
@@ -100,6 +169,19 @@ function CompletedTasks({
     </>
   );
 }
+
+const TasksListDiv = styled.div`
+  height: 100%;
+  width: 100%;
+  padding-top: 5px;
+
+  overflow: auto;
+
+  background-color: var(--frg);
+
+  color: var(--htx);
+  text-align: center;
+`;
 
 export function TasksList({
   tasks,
@@ -246,7 +328,7 @@ export function TasksList({
   }
 
   return (
-    <div id="taskslist">
+    <TasksListDiv id="taskslist">
       {tasks.length ? (
         tasks.map((task, idx) => (
           <TaskEntry
@@ -279,6 +361,6 @@ export function TasksList({
         )}
         setDeleted={partial(deleteTask, doneTasks, setDoneTasks)}
       />
-    </div>
+    </TasksListDiv>
   );
 }
