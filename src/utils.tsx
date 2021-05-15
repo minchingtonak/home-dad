@@ -13,6 +13,7 @@ import {
   MuiPickersUtilsProvider,
 } from '@material-ui/pickers';
 import DayJsUtils from '@date-io/dayjs';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 
 type Arr = readonly unknown[];
 export function partial<T extends Arr, U extends Arr, R>(
@@ -24,6 +25,24 @@ export function partial<T extends Arr, U extends Arr, R>(
 
 export function getValidURL(link: string): string {
   return link.match(/^https?:\/\//) !== null ? link : `//${link}`;
+}
+
+const ls = window.localStorage;
+
+export function useCached<T>(
+  key: string,
+  fallback: any,
+): [T, Dispatch<SetStateAction<T>>] {
+  const [data, setData] = useState<T>(() => {
+    const cached = ls.getItem(key);
+    return cached !== null ? JSON.parse(cached) : fallback;
+  });
+
+  useEffect(() => {
+    ls.setItem(key, JSON.stringify(data));
+  }, [data, key]);
+
+  return [data, setData];
 }
 
 export const HomeCheckbox = withStyles(
@@ -64,105 +83,103 @@ export const inputStyles = (txtcolor: string, linecolor: string) => ({
 // build unless !important is used. I know this probably indicates a bigger
 // issue, but I don't want to spend more time on this issue right now.
 // Other possible paths - bundle analyzer or try Vite
-export const dateTimePickerTheme = createMuiTheme(
-  {
-    overrides: {
-      MuiInput: inputStyles('var(--htx)', 'var(--htx)'),
-      MuiPaper: {
-        root: {
-          border: '3px solid var(--frg) !important',
-        },
-        rounded: {
-          borderRadius: '0 !important',
-          backgroundColor: 'var(--frg) !important',
+export const dateTimePickerTheme = createMuiTheme({
+  overrides: {
+    MuiInput: inputStyles('var(--htx)', 'var(--htx)'),
+    MuiPaper: {
+      root: {
+        border: '3px solid var(--frg) !important',
+      },
+      rounded: {
+        borderRadius: '0 !important',
+        backgroundColor: 'var(--frg) !important',
+      },
+    },
+    MuiPickersToolbar: {
+      toolbar: {
+        backgroundColor: 'var(--hdr) !important',
+      },
+    },
+    MuiPickersCalendarHeader: {
+      iconButton: {
+        backgroundColor: 'var(--hdr) !important',
+        color: 'var(--txt) !important',
+        margin: '0 5px !important',
+      },
+      switchHeader: {
+        backgroundColor: 'var(--frg) !important',
+        color: 'var(--txt) !important',
+      },
+      daysHeader: {
+        backgroundColor: 'var(--frg) !important',
+      },
+      dayLabel: {
+        color: 'var(--txt) !important',
+      },
+    },
+    MuiPickersDay: {
+      day: {
+        color: 'var(--txt) !important',
+        backgroundColor: 'var(--frg) !important',
+        '&:hover': {
+          backgroundColor: 'rgba(255, 255, 255, 0.1) !important',
         },
       },
-      MuiPickersToolbar: {
-        toolbar: {
-          backgroundColor: 'var(--hdr) !important',
-        },
-      },
-      MuiPickersCalendarHeader: {
-        iconButton: {
-          backgroundColor: 'var(--hdr) !important',
-          color: 'var(--txt) !important',
-          margin: '0 5px !important',
-        },
-        switchHeader: {
-          backgroundColor: 'var(--frg) !important',
-          color: 'var(--txt) !important',
-        },
-        daysHeader: {
-          backgroundColor: 'var(--frg) !important',
-        },
-        dayLabel: {
-          color: 'var(--txt) !important',
-        },
-      },
-      MuiPickersDay: {
-        day: {
-          color: 'var(--txt) !important',
-          backgroundColor: 'var(--frg) !important',
-          '&:hover': {
-            backgroundColor: 'rgba(255, 255, 255, 0.1) !important',
-          },
-        },
-        daySelected: {
-          backgroundColor: 'var(--htx) !important',
-          '&:hover': {
-            backgroundColor: 'var(--htx) !important',
-          },
-        },
-        dayDisabled: {
-          color: 'var(--htx) !important',
-        },
-        current: {
-          color: 'var(--txt) !important',
-        },
-      },
-      MuiPickersModal: {
-        dialogAction: {
-          color: 'red !important',
-        },
-      },
-      MuiPickersClock: {
-        clock: {
-          backgroundColor: 'var(--hdr) !important',
-        },
-        pin: {
+      daySelected: {
+        backgroundColor: 'var(--htx) !important',
+        '&:hover': {
           backgroundColor: 'var(--htx) !important',
         },
       },
-      MuiPickersClockNumber: {
-        clockNumber: {
-          color: 'var(--txt) !important',
-        },
-        clockNumberSelected: {
-          backgroundColor: 'var(--htx) !important',
-        },
+      dayDisabled: {
+        color: 'var(--htx) !important',
       },
-      MuiPickersClockPointer: {
-        pointer: {
-          backgroundColor: 'var(--htx) !important',
-        },
-        thumb: {
-          borderColor: '#00000000 !important',
-        },
-        noPoint: {
-          backgroundColor: '#00000000 !important',
-        },
+      current: {
+        color: 'var(--txt) !important',
       },
-      MuiPickersYear: {
-        root: {
-          color: 'var(--htx) !important',
-        },
-        yearSelected: {
-          color: 'var(--txt) !important',
-        },
+    },
+    MuiPickersModal: {
+      dialogAction: {
+        color: 'red !important',
+      },
+    },
+    MuiPickersClock: {
+      clock: {
+        backgroundColor: 'var(--hdr) !important',
+      },
+      pin: {
+        backgroundColor: 'var(--htx) !important',
+      },
+    },
+    MuiPickersClockNumber: {
+      clockNumber: {
+        color: 'var(--txt) !important',
+      },
+      clockNumberSelected: {
+        backgroundColor: 'var(--htx) !important',
+      },
+    },
+    MuiPickersClockPointer: {
+      pointer: {
+        backgroundColor: 'var(--htx) !important',
+      },
+      thumb: {
+        borderColor: '#00000000 !important',
+      },
+      noPoint: {
+        backgroundColor: '#00000000 !important',
+      },
+    },
+    MuiPickersYear: {
+      root: {
+        color: 'var(--htx) !important',
+      },
+      yearSelected: {
+        color: 'var(--txt) !important',
       },
     },
   },
-);
+});
 
 export const HomeInput = withStyles(inputStyles('var(--txt)', 'var(--txt)'), {
   index: 1,

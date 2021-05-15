@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import validator from 'validator';
 import { Sites, option, SITES_DATA_URL } from './config';
-import { getValidURL } from './utils';
+import { getValidURL, useCached } from './utils';
 import styled from 'styled-components';
 
 const SectionContainer = styled.div`
@@ -69,8 +69,6 @@ const Link = styled.a`
   }
 `;
 
-const ls = window.localStorage;
-
 export default function LinkSections({
   query,
   setAction,
@@ -78,23 +76,17 @@ export default function LinkSections({
   query: string;
   setAction: (s: option<string>) => void;
 }) {
-  const [sites, setSites] = useState<option<Sites>>(() => {
-    const cached = ls.getItem('sites');
-    return cached !== null ? JSON.parse(cached) : null;
-  });
+  const [sites, setSites] = useCached<option<Sites>>('sites', null);
   const [sections, setSections] = useState<JSX.Element[]>([]);
   const [selected, setSelected] = useState<option<number>>(null);
   const [totalMatched, setTotalMatched] = useState(0);
 
   useEffect(() => {
     fetch(SITES_DATA_URL)
-      .then((res) => res.text())
-      .then((text) => {
-        ls.setItem('sites', text);
-        setSites(JSON.parse(text));
-      })
+      .then((res) => res.json())
+      .then((data) => setSites(data))
       .catch((err) => console.log(err));
-  }, []);
+  }, [setSites]);
 
   useEffect(() => {
     if (sites !== null)
