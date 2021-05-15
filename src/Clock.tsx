@@ -2,14 +2,24 @@ import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import dayjs from 'dayjs';
 
+const Wrapper = styled.div`
+  width: 160px;
+
+  margin-right: auto;
+
+  display: flex;
+`;
+
 const DateSpan = styled.span`
-  margin-right: 15px;
+  align-self: flex-start;
 
   color: var(--htx);
 `;
 
 const TimeSpan = styled(DateSpan)`
   margin-right: auto;
+
+  align-self: flex-end;
 `;
 
 export default function Clock() {
@@ -25,22 +35,12 @@ export default function Clock() {
     };
   }, []);
 
-  // function to24hour(d: Date): string {
-  //   function pad(time: number) {
-  //     return time < 10 ? `0${time}` : time;
-  //   }
-
-  //   return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
-  // }
-
   return (
     <>
-      <DateSpan id="date">
-        {dayjs(date).format('dddd, MMM D')}
-      </DateSpan>
-      <TimeSpan id="clock">
-        {dayjs(date).format('HH:mm:ss')}
-      </TimeSpan>
+      <Wrapper>
+        <TimeSpan id="clock">{dayjs(date).format('HH:mm:ss')}</TimeSpan>
+        <DateSpan id="date">{dayjs(date).format('ddd, MMM D')}</DateSpan>
+      </Wrapper>
     </>
   );
 }

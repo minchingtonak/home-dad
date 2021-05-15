@@ -7,22 +7,23 @@ const StaticLinksContainer = styled.div`
 
   display: flex;
   justify-content: flex-start;
+  flex-wrap: wrap;
   align-items: center;
 
   padding: 0 5px;
   width: var(--lwidth);
-  height: 30px;
 
   background-color: var(--hdr);
 
   color: var(--txt);
   font-size: 16px;
   line-height: 30px;
-  text-align: right;
+  text-align: center;
 
   @media screen and (max-width: 912px) {
     & {
       width: var(--mwidth);
+      margin: 2px auto 0 auto;
     }
   }
 
@@ -43,6 +44,12 @@ const StaticLink = styled.a`
 
   & + & {
     margin-left: 15px;
+  }
+
+  @media screen and (max-width: 608px) {
+    &:first-of-type {
+      margin-left: 110px;
+    }
   }
 `;
 

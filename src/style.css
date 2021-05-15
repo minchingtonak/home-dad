@@ -1,27 +1,27 @@
 :root {
   --base: 220;
   --hdr: hsl(calc(var(--base) - 1), 21%, 13%); /* Header Background Color */
-  --bkg: hsl(
-    var(--base),
-    20%,
-    9%
-  ); /* Background Color - Also located inside index.html <style> hard-coded */
+  --bkg: hsl(var(--base), 20%, 9%); /* Background Color */
   --frg: hsl(var(--base), 20%, 17%); /* Foreground Color */
   --hgl: hsl(calc(var(--base) - 10), 100%, 40%); /* Highlight Color */
 
   --htx: #666; /* Header Text Color */
-  --txt: #a6a6a6; /* Text Color */
+  --txt: #888888; /* Text Color */
 
-  --lwidth: 908px;
+  --screen-m: 912px; /* Screen breakpoints */
+  --screen-s: 608px;
+
+  --lwidth: 908px; /* Widths for homesearch */
   --mwidth: 604px;
   --swidth: 300px;
 
-  --max-links: 7;
+  --max-links: 7; /* Default value */
   --section-padding: 10px;
   --link-text-height: 20px;
   --link-margin: 5px;
   --link-height: calc(var(--link-text-height) + var(--link-margin));
 
+  --section-width: 300px;
   --section-height: calc(
     calc(var(--max-links) + 1) * var(--link-height) + var(--section-padding)
   );
@@ -38,13 +38,24 @@ body {
   background-color: var(--bkg);
   font-family: Montserrat;
   overflow-x: hidden;
-  height: 100%;
   width: 100%;
+  height: 100%;
   margin: 0;
 }
 
+@media screen and (max-width: 912px) {
+  html, body {
+    height: unset;
+  }
+}
+
+/* @media screen and (max-width: 608px) {
+} */
+
 body {
-  display: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Corner links styling */
@@ -102,7 +113,7 @@ div#bottom-link-wrapper {
   }
 }
 
-/* Search box styling */
+/* Root container styling */
 
 div#wiper {
   opacity: 0 !important;
@@ -111,19 +122,27 @@ div#wiper {
 
 div#root {
   width: 100%;
-  height: 100%;
   display: flex;
   flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: center;
+  flex-wrap: wrap-reverse;
+  justify-content: space-evenly;
   align-items: center;
 }
 
 /* Home Tasks */
 
 body > div#root > div#tasksmain {
-  order: 1;
-  width: fit-content;
+  width: var(--section-width);
+  height: var(--homesearch-height);
+  display: flex;
+  flex-direction: column;
+}
+
+@media screen and (max-width: 608px) {
+  body > div#root > div#tasksmain {
+    height: min-content;
+    margin: 0 0 20px 0;
+  }
 }
 
 body > div#root > div#tasksmain > div#tasksbar {
@@ -140,11 +159,11 @@ body > div#root > div#tasksmain > div#taskslist {
   width: 100%;
   padding-top: 5px;
   background-color: var(--frg);
-  height: 403px; /* fix magic number later */
   color: var(--htx);
   text-align: center;
   overflow: auto;
 }
+
 
 body > div#root > div#tasksmain > div#taskslist > div.taskentry {
   margin-bottom: 5px;
@@ -188,18 +207,33 @@ body > div#root > div#tasksmain > div#taskslist > div#completedtasks > hr {
 }
 
 body > div#root > div#tasksmain > div#taskslist > div#completedtasks:hover {
-  color: var(--txt)
+  color: var(--txt);
 }
 
-body > div#root > div#tasksmain > div#taskslist > div#completedtasks:hover > hr {
+body
+  > div#root
+  > div#tasksmain
+  > div#taskslist
+  > div#completedtasks:hover
+  > hr {
   background-color: var(--txt);
 }
 
-body > div#root > div#tasksmain > div#taskslist > div#completedtasks > i.fa-chevron-right {
+body
+  > div#root
+  > div#tasksmain
+  > div#taskslist
+  > div#completedtasks
+  > i.fa-chevron-right {
   margin-right: 7px;
 }
 
-body > div#root > div#tasksmain > div#taskslist > div#completedtasks > i.fa-chevron-down {
+body
+  > div#root
+  > div#tasksmain
+  > div#taskslist
+  > div#completedtasks
+  > i.fa-chevron-down {
   margin-right: 3px;
 }
 
@@ -220,7 +254,6 @@ body > div#root > div#tasksmain > div#taskslist > div > .fa-trash-alt {
 }
 
 body > div#root > div#tasksmain > div#taskslist > div > div > input#desc {
-  order: 0;
   background-color: inherit;
   color: inherit;
   font-family: inherit;
@@ -231,8 +264,7 @@ body > div#root > div#tasksmain > div#taskslist > div > div > input#desc {
 }
 
 body > div#root > div#tasksmain > div#taskslist > div > div > span#due {
-  order: 1;
-  margin: 5px;
+  /* margin: 5px; */
   margin-right: 0;
   display: flex;
   align-content: flex-start;

@@ -9,7 +9,7 @@ export default function App() {
       return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    // Choose a random page color scheme on page load
+    // Choose a random page color base on page load
     document.documentElement.style.setProperty(
       '--base',
       `${random(PAGE_HUE_MIN, PAGE_HUE_MAX)}`,
@@ -19,7 +19,6 @@ export default function App() {
   return (
     <>
       <HomeSearch />
-      <div style={{ padding: 30 }}></div>
       <HomeTasks />
     </>
   );

@@ -14,7 +14,7 @@ const SectionContainer = styled.div`
   box-sizing: border-box;
   margin: 2px;
   height: var(--section-height);
-  width: 300px;
+  width: var(--section-width);
 
   background-color: var(--hdr);
 
@@ -61,12 +61,12 @@ const Link = styled.a`
   color: var(--txt);
   text-decoration: none;
 
-  &:hover, &.selected {
+  &:hover,
+  &.selected {
     background-color: rgba(255, 255, 255, 0.05);
 
     color: var(--hgl);
   }
-
 `;
 
 const ls = window.localStorage;
@@ -90,20 +90,23 @@ export default function LinkSections({
     fetch(SITES_DATA_URL)
       .then((res) => res.text())
       .then((text) => {
-        const data = JSON.parse(text);
-        setSites(data);
         ls.setItem('sites', text);
-        document.documentElement.style.setProperty(
-          '--max-links',
-          `${Math.max(
-            ...Object.keys(data).map(
-              (category) => Object.keys(data[category]).length,
-            ),
-          )}`,
-        );
+        setSites(JSON.parse(text));
       })
       .catch((err) => console.log(err));
   }, []);
+
+  useEffect(() => {
+    if (sites !== null)
+      document.documentElement.style.setProperty(
+        '--max-links',
+        `${Math.max(
+          ...Object.keys(sites).map(
+            (category) => Object.keys(sites[category]).length,
+          ),
+        )}`,
+      );
+  }, [sites]);
 
   const updateSections = useCallback(
     function (newSelected: option<number>) {

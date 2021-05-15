@@ -7,10 +7,11 @@ import {
   SEARCH_TAB_PREFIX,
 } from './config';
 import { getValidURL } from './utils';
-import styled from "styled-components";
+import styled from 'styled-components';
 
 const SearchInput = styled.input`
   margin: 0px 2px 2px 2px;
+  padding-left: 5px;
   box-sizing: border-box;
 
   border: none;
@@ -102,10 +103,7 @@ export default function SearchBar({
       onSubmit={(e) => {
         e.preventDefault();
         // TODO - code to handle todo list commands
-        const travelTo = ctrlPressed
-          ? window.open
-          : window.location.assign.bind(window.location);
-        travelTo(
+        window.location.assign(
           action !== null
             ? getValidURL(action)
             : `${DEFAULT_SEARCH_URL}?q=${text}`,
@@ -118,7 +116,10 @@ export default function SearchBar({
         ref={input}
         autoFocus
         autoComplete="off"
-        onChange={(e) => setText(e.target.value)}
+        onChange={(e) => {
+          // console.log(e.target.value);
+          setText(e.target.value);
+        }}
       />
     </form>
   );
