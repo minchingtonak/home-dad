@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useResizeDetector } from 'react-resize-detector';
 import { option } from './config';
 import LinkSections from './LinkSections';
@@ -20,10 +20,21 @@ export default function HomeSearch() {
   const [action, setAction] = useState<option<string>>(null);
   const { height, ref } = useResizeDetector();
 
-  document.documentElement.style.setProperty(
-    '--homesearch-height',
-    `${height as number}px`,
-  );
+  useEffect(() => {
+    if (
+      height !== undefined &&
+      height >
+        parseInt(
+          getComputedStyle(document.documentElement)
+            .getPropertyValue('--homesearch-height')
+            .slice(0, -2),
+        )
+    )
+      document.documentElement.style.setProperty(
+        '--homesearch-height',
+        `${height}px`,
+      );
+  }, [height]);
 
   return (
     <MainContainer id="main" ref={ref}>

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import {
   DEFAULT_SEARCH_URL,
   DEFAULT_TAB_TITLE,
@@ -6,8 +6,9 @@ import {
   option,
   SEARCH_TAB_PREFIX,
 } from './config';
-import { getValidURL } from './utils';
+import { getValidURL, HomeDateTimePicker, partial } from './utils';
 import styled from 'styled-components';
+import { AddTaskContext } from './utils';
 
 const SearchInput = styled.input`
   margin: 0px 2px 2px 2px;
@@ -21,6 +22,7 @@ const SearchInput = styled.input`
   font-size: 40px;
   background-color: var(--frg);
   color: var(--txt);
+  font-family: Terminus, Montserrat;
 
   &:focus {
     outline: none;
@@ -39,6 +41,10 @@ const SearchInput = styled.input`
   }
 `;
 
+const SearchDateTimePicker = styled(HomeDateTimePicker)`
+  display: none !important;
+`;
+
 export default function SearchBar({
   text,
   setText,
@@ -49,6 +55,9 @@ export default function SearchBar({
   action: option<string>;
 }) {
   const input = useRef<HTMLInputElement>(null);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [taskText, setTaskText] = useState<option<string>>(null);
+  const { addTask } = useContext(AddTaskContext);
 
   // useEffect(() => {
   //   // Clikcing on anything except a link will focus the search bar
@@ -82,45 +91,53 @@ export default function SearchBar({
     };
   }, [updateTitle]);
 
-  const [ctrlPressed, setCtrlPressed] = useState(false);
-
-  useEffect(() => {
-    function toggle(e: KeyboardEvent) {
-      if (e.key === 'Control') setCtrlPressed(!ctrlPressed);
-    }
-    document.addEventListener('keydown', toggle);
-    document.addEventListener('keyup', toggle);
-
-    return () => {
-      document.removeEventListener('keydown', toggle);
-      document.removeEventListener('keyup', toggle);
-    };
-  }, [ctrlPressed]);
-
   return (
-    <form
-      id={'action'}
-      onSubmit={(e) => {
-        e.preventDefault();
-        // TODO - code to handle todo list commands
-        window.location.assign(
-          action !== null
-            ? getValidURL(action)
-            : `${DEFAULT_SEARCH_URL}?q=${text}`,
-        );
-      }}
-    >
-      <SearchInput
-        type="text"
-        value={text}
-        ref={input}
-        autoFocus
-        autoComplete="off"
-        onChange={(e) => {
-          // console.log(e.target.value);
-          setText(e.target.value);
+    <>
+      <form
+        id={'action'}
+        onSubmit={(e) => {
+          e.preventDefault();
+
+          if (/^\/t(ask)?/.test(text)) {
+            const matches = text.match(/[\s].*/g);
+            setTaskText(matches !== null ? matches[0].trim() : null);
+            setPickerOpen(true);
+            return;
+          }
+
+          window.location.assign(
+            encodeURI(
+              action !== null
+                ? getValidURL(action)
+                : `${DEFAULT_SEARCH_URL}?q=${text}`,
+            ),
+          );
         }}
+      >
+        <SearchInput
+          type="text"
+          value={text}
+          ref={input}
+          autoFocus
+          autoComplete="off"
+          onChange={(e) => setText(e.target.value)}
+        />
+      </form>
+      <SearchDateTimePicker
+        variant="dialog"
+        autoOk
+        hideTabs={true}
+        okLabel={<></>}
+        cancelLabel={<></>}
+        value={new Date()}
+        open={pickerOpen}
+        onChange={() => {}}
+        onAccept={(d) => {
+          if (taskText !== null && d)
+            addTask({ text: taskText, due: d.toDate() });
+        }}
+        onClose={partial(setPickerOpen, false)}
       />
-    </form>
+    </>
   );
 }

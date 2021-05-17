@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import dayjs from 'dayjs';
 
 const Wrapper = styled.div`
-  width: 160px;
+  width: 180px;
 
   margin-right: auto;
 

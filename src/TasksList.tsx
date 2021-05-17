@@ -1,15 +1,17 @@
 import {
+  NewTask,
   Task,
   TASKS_API_URL,
   TASK_DELETE_DELAY,
   TASK_UPDATE_DELAY,
 } from './config';
 import update from 'immutability-helper';
-import { useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import {
   HomeCheckbox,
   HomeDateTimePicker,
   HomeMaterialInput,
+  AddTaskContext,
   partial,
 } from './utils';
 import styled from 'styled-components';
@@ -29,6 +31,8 @@ const TaskEntryDiv = styled.div`
 
 const TaskDescInput = styled(HomeMaterialInput)`
   margin: 10px 10px 10px 7px;
+
+  font-size: large;
 `;
 
 const TaskUIDiv = styled.div`
@@ -73,7 +77,7 @@ function TaskEntry({
         <TaskDescInput
           error={task.text === ''}
           value={task.text}
-          style={{ fontSize: 'large' }}
+          placeholder="Description cannot be empty"
           onChange={(e) => setTask({ text: e.target.value })}
         />
         <DueDateDiv>
@@ -84,7 +88,7 @@ function TaskEntry({
             ampm={false}
             hideTabs={true}
             value={task.due}
-            format={'dddd, MMM D [at] H:mm'}
+            format={'ddd, MMM D [at] H:mm'}
             onChange={(d) => setTask({ due: d?.toDate() })}
           />
         </DueDateDiv>
@@ -194,6 +198,33 @@ export function TasksList({
   completed: Task[];
   setCompleted: (t: Task[]) => void;
 }) {
+  const { setAddTask } = useContext(AddTaskContext);
+
+  const addTask = useCallback((task: NewTask) => {
+    console.log(`adding ${task}`);
+    fetch(TASKS_API_URL, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(task),
+    })
+      .then((res) => res.json())
+      .then((task: Task) => {
+        setTasks(
+          update(tasks, { $push: [task] }).sort(
+            (a, b) => new Date(a.due).getTime() - new Date(b.due).getTime(),
+          ),
+        );
+      })
+      .catch((e) => console.log(e));
+  }, [tasks, setTasks]);
+
+  useEffect(() => {
+    setAddTask(addTask);
+  }, [addTask, setAddTask]);
+
   const [updateTimer, setUpdateTimer] = useState<number | undefined>(undefined);
   const [toBeUpdated, setToBeUpdated] = useState<{
     [k: string]: Partial<Task>;
@@ -254,7 +285,7 @@ export function TasksList({
     );
   }
 
-  const [deleteTimer, setDeleteTimer] = useState<number | undefined>(undefined);
+  const [deleteTimer, setDeleteTimer] = useState<number | undefined>();
   const [toDelete, setToDelete] = useState<string[]>([]);
 
   function deleteTask(list: Task[], setList: (t: Task[]) => void, idx: number) {

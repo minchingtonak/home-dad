@@ -13,7 +13,8 @@ import {
   MuiPickersUtilsProvider,
 } from '@material-ui/pickers';
 import DayJsUtils from '@date-io/dayjs';
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { createContext, Dispatch, SetStateAction, useEffect, useReducer, useState } from 'react';
+import { NewTask } from './config';
 
 type Arr = readonly unknown[];
 export function partial<T extends Arr, U extends Arr, R>(
@@ -60,17 +61,17 @@ export const HomeCheckbox = withStyles(
 
 export const inputStyles = (txtcolor: string, linecolor: string) => ({
   root: {
-    color: txtcolor,
+    color: `${txtcolor} !important`,
   },
   underline: {
     '&:before': {
-      borderBottom: `1px solid ${linecolor}`,
+      borderBottom: `1px solid ${linecolor} !important`,
     },
     '&:hover:not($disabled):not($focused):not($error):before': {
-      borderBottom: `2px solid ${linecolor}`,
+      borderBottom: `2px solid ${linecolor} !important`,
     },
     '&:after': {
-      borderBottom: `3px solid ${linecolor}`,
+      borderBottom: `3px solid ${linecolor} !important`,
     },
   },
   disabled: {},
@@ -78,7 +79,7 @@ export const inputStyles = (txtcolor: string, linecolor: string) => ({
   error: {},
 });
 
-// If you're windering why everything in this theme is !important,
+// If you're wondering why everything in this theme is !important,
 // I am too :). Calendar styling doesn't show up correctly in production
 // build unless !important is used. I know this probably indicates a bigger
 // issue, but I don't want to spend more time on this issue right now.
@@ -102,15 +103,16 @@ export const dateTimePickerTheme = createMuiTheme({
     },
     MuiPickersCalendarHeader: {
       iconButton: {
-        backgroundColor: 'var(--hdr) !important',
         color: 'var(--txt) !important',
+        backgroundColor: 'var(--hdr) !important',
         margin: '0 5px !important',
       },
       switchHeader: {
-        backgroundColor: 'var(--frg) !important',
         color: 'var(--txt) !important',
+        backgroundColor: 'var(--frg) !important',
       },
       daysHeader: {
+        color: 'var(--txt) !important',
         backgroundColor: 'var(--frg) !important',
       },
       dayLabel: {
@@ -126,9 +128,10 @@ export const dateTimePickerTheme = createMuiTheme({
         },
       },
       daySelected: {
-        backgroundColor: 'var(--htx) !important',
+        color: 'var(--txt) !important',
+        backgroundColor: 'var(--hdr) !important',
         '&:hover': {
-          backgroundColor: 'var(--htx) !important',
+          backgroundColor: 'var(--bkg) !important',
         },
       },
       dayDisabled: {
@@ -138,17 +141,12 @@ export const dateTimePickerTheme = createMuiTheme({
         color: 'var(--txt) !important',
       },
     },
-    MuiPickersModal: {
-      dialogAction: {
-        color: 'red !important',
-      },
-    },
     MuiPickersClock: {
       clock: {
         backgroundColor: 'var(--hdr) !important',
       },
       pin: {
-        backgroundColor: 'var(--htx) !important',
+        backgroundColor: 'var(--frg) !important',
       },
     },
     MuiPickersClockNumber: {
@@ -156,15 +154,16 @@ export const dateTimePickerTheme = createMuiTheme({
         color: 'var(--txt) !important',
       },
       clockNumberSelected: {
-        backgroundColor: 'var(--htx) !important',
+        backgroundColor: 'var(--frg) !important',
       },
     },
     MuiPickersClockPointer: {
       pointer: {
-        backgroundColor: 'var(--htx) !important',
+        backgroundColor: 'var(--frg) !important',
       },
       thumb: {
         borderColor: '#00000000 !important',
+        backgroundColor: 'var(--frg) !important',
       },
       noPoint: {
         backgroundColor: '#00000000 !important',
@@ -195,5 +194,31 @@ export function HomeDateTimePicker(props: DateTimePickerProps) {
         <DateTimePicker {...props} />
       </ThemeProvider>
     </MuiPickersUtilsProvider>
+  );
+}
+
+// Context stuff
+
+type AddTask = (t: NewTask) => void;
+type AddTaskContextType = {
+  addTask: AddTask;
+  setAddTask: Dispatch<AddTask>;
+};
+
+export const AddTaskContext = createContext<AddTaskContextType>({
+  addTask: (t: NewTask) => {},
+  setAddTask: () => {},
+});
+
+export function AddTaskStore({ children }: { children: JSX.Element[] }) {
+  const [state, dispatch] = useReducer(
+    (_: AddTask, a: AddTask) => a,
+    (t: NewTask) => {},
+  );
+
+  return (
+    <AddTaskContext.Provider value={{ addTask: state, setAddTask: dispatch }}>
+      {children}
+    </AddTaskContext.Provider>
   );
 }

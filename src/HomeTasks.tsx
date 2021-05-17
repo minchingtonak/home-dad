@@ -15,12 +15,12 @@ const TasksMainDiv = styled.div`
   @media screen and (max-width: 608px) {
     & {
       height: min-content;
-      margin: 0 0 20px 0;
+      margin: 0 0 60px 0;
     }
   }
 `;
 
-export function HomeTasks() {
+export default function HomeTasks() {
   const [tasks, setTasks] = useCached<Task[]>('tasks', []);
   const [completed, setCompleted] = useCached<Task[]>('completed', []);
 
@@ -40,7 +40,7 @@ export function HomeTasks() {
 
   return (
     <TasksMainDiv id="tasksmain">
-      <TasksBar setTasks={setTasks} />
+      <TasksBar tasks={tasks} setTasks={setTasks} />
       <TasksList
         tasks={tasks}
         setTasks={setTasks}

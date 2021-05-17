@@ -1,11 +1,12 @@
 import { useEffect } from 'react';
 import HomeSearch from './HomeSearch';
+import HomeTasks from './HomeTasks';
 import { PAGE_HUE_MAX, PAGE_HUE_MIN } from './config';
-import { HomeTasks } from './HomeTasks';
+import { AddTaskStore } from './utils';
 
 export default function App() {
   useEffect(() => {
-    function random(min: number, max: number): number {
+    function random(min: number, max: number) {
       return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
@@ -17,9 +18,9 @@ export default function App() {
   }, []);
 
   return (
-    <>
+    <AddTaskStore>
       <HomeSearch />
       <HomeTasks />
-    </>
+    </AddTaskStore>
   );
 }

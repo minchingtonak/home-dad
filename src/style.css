@@ -21,6 +21,7 @@
   --link-margin: 5px;
   --link-height: calc(var(--link-text-height) + var(--link-margin));
 
+  --homesearch-height: 400px;
   --section-width: 300px;
   --section-height: calc(
     calc(var(--max-links) + 1) * var(--link-height) + var(--section-padding)

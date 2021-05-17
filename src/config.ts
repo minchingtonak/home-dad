@@ -16,11 +16,13 @@ export const TASK_DELETE_DELAY = 500; // ms
 
 export type option<T> = T | null;
 export type Sites = { [k: string]: { [k: string]: string } };
-export type Task = {
+export interface NewTask {
   text: string;
   due: Date;
+}
+export interface Task extends NewTask {
   completed: boolean;
   _id: string;
   createdAt: Date;
   updatedAt: Date;
-};
+}
