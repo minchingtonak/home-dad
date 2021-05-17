@@ -18,7 +18,7 @@ import styled from 'styled-components';
 
 const TaskEntryDiv = styled.div`
   margin: 0 5px 5px 5px;
-  padding: 0 0 5px 0;
+  padding: 0 0 10px 0;
 
   display: flex;
   flex-direction: row;
@@ -30,12 +30,14 @@ const TaskEntryDiv = styled.div`
 `;
 
 const TaskDescInput = styled(HomeMaterialInput)`
-  margin: 10px 10px 10px 7px;
+  // margin: 10px 10px 10px 7px;
 
   font-size: large;
 `;
 
 const TaskUIDiv = styled.div`
+  padding-top: 3px;
+
   display: flex;
   flex-direction: column;
 `;
@@ -43,7 +45,9 @@ const TaskUIDiv = styled.div`
 const TrashIcon = styled.i.attrs({ className: 'far fa-trash-alt fa-lg' })`
   padding: 10px;
 
-  align-self: center;
+  transform: scale(0.96);
+
+  color: var(--htx);
 `;
 
 const DueDateDiv = styled.div`
@@ -54,9 +58,13 @@ const DueDateDiv = styled.div`
   align-items: center;
 `;
 
-const DueIcon = styled.i.attrs({ className: 'far fa-clock' })`
-  margin: 5px 5px 5px 0;
-  color: var(--htx);
+// const DueIcon = styled.i.attrs({ className: 'far fa-clock' })`
+//   margin: 5px 5px 5px 0;
+//   color: var(--htx);
+// `;
+
+const TaskDateTimePicker = styled(HomeDateTimePicker)`
+  transform: scale(0.88) translateX(-13px);
 `;
 
 function TaskEntry({
@@ -81,8 +89,8 @@ function TaskEntry({
           onChange={(e) => setTask({ text: e.target.value })}
         />
         <DueDateDiv>
-          <DueIcon />
-          <HomeDateTimePicker
+          {/* <DueIcon /> */}
+          <TaskDateTimePicker
             variant="inline"
             autoOk
             ampm={false}
