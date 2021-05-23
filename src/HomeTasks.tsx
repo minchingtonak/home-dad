@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Task, TASKS_API_URL } from './config';
 import { TasksBar } from './TasksBar';
 import { TasksList } from './TasksList';
-import { useCached } from './utils';
+import { useCached, useLogin } from './utils';
 import styled from 'styled-components';
 
 const TasksMainDiv = styled.div`
@@ -23,24 +23,33 @@ const TasksMainDiv = styled.div`
 export default function HomeTasks() {
   const [tasks, setTasks] = useCached<Task[]>('tasks', []);
   const [completed, setCompleted] = useCached<Task[]>('completed', []);
+  const { logUser } = useLogin();
 
   useEffect(() => {
-    fetch(`${TASKS_API_URL}?completed=false`, { method: 'GET' })
-      .then((res) => res.json())
-      .then((data) => setTasks(data.tasks))
-      .catch((e) => console.log(e));
-  }, [setTasks]);
+    if (logUser !== null)
+      fetch(`${TASKS_API_URL}?completed=false`, {
+        method: 'GET',
+        credentials: 'same-origin',
+      })
+        .then((res) => res.json())
+        .then((data) => setTasks(data.tasks))
+        .catch((e) => console.log(e));
+  }, [logUser, setTasks]);
 
   useEffect(() => {
-    fetch(`${TASKS_API_URL}?completed=true`, { method: 'GET' })
-      .then((res) => res.json())
-      .then((data) => setCompleted(data.tasks))
-      .catch((e) => console.log(e));
-  }, [setCompleted]);
+    if (logUser !== null)
+      fetch(`${TASKS_API_URL}?completed=true`, {
+        method: 'GET',
+        credentials: 'same-origin',
+      })
+        .then((res) => res.json())
+        .then((data) => setCompleted(data.tasks))
+        .catch((e) => console.log(e));
+  }, [logUser, setCompleted]);
 
   return (
     <TasksMainDiv id="tasksmain">
-      <TasksBar tasks={tasks} setTasks={setTasks} />
+      <TasksBar />
       <TasksList
         tasks={tasks}
         setTasks={setTasks}

@@ -1,4 +1,13 @@
 import {
+  createContext,
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useReducer,
+  useState,
+} from 'react';
+import {
   CheckboxProps,
   Checkbox,
   InputProps,
@@ -13,8 +22,7 @@ import {
   MuiPickersUtilsProvider,
 } from '@material-ui/pickers';
 import DayJsUtils from '@date-io/dayjs';
-import { createContext, Dispatch, SetStateAction, useEffect, useReducer, useState } from 'react';
-import { NewTask } from './config';
+import { NewTask, option } from './config';
 
 type Arr = readonly unknown[];
 export function partial<T extends Arr, U extends Arr, R>(
@@ -25,18 +33,18 @@ export function partial<T extends Arr, U extends Arr, R>(
 }
 
 export function getValidURL(link: string): string {
-  return link.match(/^https?:\/\//) !== null ? link : `//${link}`;
+  return /^https?:\/\//.test(link) !== null ? link : `//${link}`;
 }
 
 const ls = window.localStorage;
 
 export function useCached<T>(
   key: string,
-  fallback: T,
+  defaultValue: T,
 ): [T, Dispatch<SetStateAction<T>>] {
   const [data, setData] = useState<T>(() => {
     const cached = ls.getItem(key);
-    return cached !== null ? JSON.parse(cached) : fallback;
+    return cached !== null ? JSON.parse(cached) : defaultValue;
   });
 
   useEffect(() => {
@@ -44,6 +52,37 @@ export function useCached<T>(
   }, [data, key]);
 
   return [data, setData];
+}
+
+export function useQuery(key: string): {
+  param: option<string>;
+  setParam: Dispatch<SetStateAction<option<string>>>;
+} {
+  const [param, setParam] = useState<option<string>>(() => {
+    const queryParams = new URLSearchParams(window.location.search);
+    return queryParams.has(key) ? queryParams.get(key) : null;
+  });
+
+  useEffect(() => {
+    const queryParams = new URLSearchParams(window.location.search);
+    const set = param !== null;
+
+    if (set) queryParams.set(key, param as string);
+    else queryParams.delete(key);
+
+    window.history.replaceState(
+      null,
+      key,
+      `?${queryParams.toString()}${window.location.hash}`,
+    );
+  }, [param, key]);
+
+  return { param, setParam };
+}
+
+export function useLoginError() {
+  const { param, setParam } = useQuery('loginerror');
+  return { loginError: param, setLoginError: setParam };
 }
 
 export const HomeCheckbox = withStyles(
@@ -199,6 +238,32 @@ export function HomeDateTimePicker(props: DateTimePickerProps) {
 
 // Context stuff
 
+type LoginContextType = {
+  logUser: option<string>;
+  setLogUser: Dispatch<option<string>>;
+};
+
+export const LoginContext = createContext<LoginContextType>({
+  logUser: null,
+  setLogUser: () => {},
+});
+
+export function LoginStore({
+  children,
+}: {
+  children: JSX.Element | JSX.Element[];
+}) {
+  const [logUser, setLogUser] = useCached<option<string>>('loguser', null);
+
+  return (
+    <LoginContext.Provider value={{ logUser: logUser, setLogUser: setLogUser }}>
+      {children}
+    </LoginContext.Provider>
+  );
+}
+
+export const useLogin = () => useContext(LoginContext);
+
 type AddTask = (t: NewTask) => void;
 type AddTaskContextType = {
   addTask: AddTask;
@@ -210,7 +275,11 @@ export const AddTaskContext = createContext<AddTaskContextType>({
   setAddTask: () => {},
 });
 
-export function AddTaskStore({ children }: { children: JSX.Element[] }) {
+export function AddTaskStore({
+  children,
+}: {
+  children: JSX.Element | JSX.Element[];
+}) {
   const [state, dispatch] = useReducer(
     (_: AddTask, a: AddTask) => a,
     (t: NewTask) => {},
@@ -222,3 +291,5 @@ export function AddTaskStore({ children }: { children: JSX.Element[] }) {
     </AddTaskContext.Provider>
   );
 }
+
+export const useAddTask = () => useContext(AddTaskContext);

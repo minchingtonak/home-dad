@@ -1,14 +1,21 @@
-import { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import styled from 'styled-components';
 import {
   DEFAULT_SEARCH_URL,
   DEFAULT_TAB_TITLE,
   NOTE_TAB_PREFIX,
   option,
   SEARCH_TAB_PREFIX,
+  TASKS_API_URL,
 } from './config';
-import { getValidURL, HomeDateTimePicker, partial } from './utils';
-import styled from 'styled-components';
-import { AddTaskContext } from './utils';
+import {
+  getValidURL,
+  HomeDateTimePicker,
+  partial,
+  useAddTask,
+  useLogin,
+  useLoginError,
+} from './utils';
 
 const SearchInput = styled.input`
   margin: 0px 2px 2px 2px;
@@ -57,7 +64,9 @@ export default function SearchBar({
   const input = useRef<HTMLInputElement>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [taskText, setTaskText] = useState<option<string>>(null);
-  const { addTask } = useContext(AddTaskContext);
+  const { addTask } = useAddTask();
+  const { setLogUser } = useLogin();
+  const { setLoginError } = useLoginError();
 
   // useEffect(() => {
   //   // Clikcing on anything except a link will focus the search bar
@@ -104,13 +113,33 @@ export default function SearchBar({
             setPickerOpen(true);
             return;
           }
+          if (/^\/logout/.test(text)) {
+            e.preventDefault();
+            fetch(`${TASKS_API_URL}/logout/`, {
+              method: 'post',
+              credentials: 'same-origin',
+            })
+              .then((res) => {
+                if (!res.ok || res.status !== 200)
+                  throw new Error('failed to logout');
+
+                // must set loginerror before loguser to prevent
+                // the error where an unmounted component cannot
+                // update state
+                setLoginError(null);
+                setLogUser(null);
+                window.localStorage.clear();
+              })
+              .catch(() => {
+                setLoginError('true');
+              });
+            return;
+          }
 
           window.location.assign(
-            encodeURI(
-              action !== null
-                ? getValidURL(action)
-                : `${DEFAULT_SEARCH_URL}?q=${text}`,
-            ),
+            action !== null
+              ? getValidURL(action)
+              : `${DEFAULT_SEARCH_URL}?q=${encodeURIComponent(text)}`,
           );
         }}
       >

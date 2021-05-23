@@ -18,7 +18,6 @@ const StaticLinksContainer = styled.div`
   color: var(--txt);
   font-size: 16px;
   line-height: 30px;
-  text-align: center;
 
   @media screen and (max-width: 912px) {
     & {

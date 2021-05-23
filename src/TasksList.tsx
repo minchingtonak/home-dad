@@ -6,15 +6,18 @@ import {
   TASK_UPDATE_DELAY,
 } from './config';
 import update from 'immutability-helper';
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   HomeCheckbox,
   HomeDateTimePicker,
   HomeMaterialInput,
-  AddTaskContext,
   partial,
+  useAddTask,
+  useLogin,
+  useLoginError,
 } from './utils';
 import styled from 'styled-components';
+import { LoginPanel } from './LoginPanel';
 
 const TaskEntryDiv = styled.div`
   margin: 0 5px 5px 5px;
@@ -58,10 +61,10 @@ const DueDateDiv = styled.div`
   align-items: center;
 `;
 
-// const DueIcon = styled.i.attrs({ className: 'far fa-clock' })`
-//   margin: 5px 5px 5px 0;
-//   color: var(--htx);
-// `;
+const DueIcon = styled.i.attrs({ className: 'far fa-clock' })`
+  margin: 5px 5px 5px 4px;
+  color: var(--htx);
+`;
 
 const TaskDateTimePicker = styled(HomeDateTimePicker)`
   transform: scale(0.88) translateX(-13px);
@@ -83,13 +86,13 @@ function TaskEntry({
       <HomeCheckbox checked={task.completed} onChange={setChecked} />
       <TaskUIDiv>
         <TaskDescInput
-          error={task.text === ''}
           value={task.text}
+          error={task.text === ''}
           placeholder="Description cannot be empty"
           onChange={(e) => setTask({ text: e.target.value })}
         />
         <DueDateDiv>
-          {/* <DueIcon /> */}
+          <DueIcon />
           <TaskDateTimePicker
             variant="inline"
             autoOk
@@ -195,6 +198,23 @@ const TasksListDiv = styled.div`
   text-align: center;
 `;
 
+type LogoutFailedWarningProps = {
+  failed: boolean;
+};
+
+const LogoutFailedWarning = styled.span<LogoutFailedWarningProps>`
+  margin: 0 0 5px 0;
+
+  display: ${(props) => (props.failed ? 'inherit' : 'none')};
+
+  color: red;
+  font-size: 0.8em;
+`;
+
+const NoTasksText = styled.p`
+  margin: 20px 5px;
+`;
+
 export function TasksList({
   tasks,
   setTasks,
@@ -206,28 +226,32 @@ export function TasksList({
   completed: Task[];
   setCompleted: (t: Task[]) => void;
 }) {
-  const { setAddTask } = useContext(AddTaskContext);
+  const { setAddTask } = useAddTask();
+  const { logUser } = useLogin();
+  const { loginError } = useLoginError();
 
-  const addTask = useCallback((task: NewTask) => {
-    console.log(`adding ${task}`);
-    fetch(TASKS_API_URL, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(task),
-    })
-      .then((res) => res.json())
-      .then((task: Task) => {
-        setTasks(
-          update(tasks, { $push: [task] }).sort(
-            (a, b) => new Date(a.due).getTime() - new Date(b.due).getTime(),
-          ),
-        );
+  const addTask = useCallback(
+    (task: NewTask) => {
+      fetch(TASKS_API_URL, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(task),
       })
-      .catch((e) => console.log(e));
-  }, [tasks, setTasks]);
+        .then((res) => res.json())
+        .then((task: Task) => {
+          setTasks(
+            update(tasks, { $push: [task] }).sort(
+              (a, b) => new Date(a.due).getTime() - new Date(b.due).getTime(),
+            ),
+          );
+        })
+        .catch((e) => console.log(e));
+    },
+    [tasks, setTasks],
+  );
 
   useEffect(() => {
     setAddTask(addTask);
@@ -366,40 +390,52 @@ export function TasksList({
       .catch((e) => console.log(e));
   }
 
-  return (
-    <TasksListDiv id="taskslist">
-      {tasks.length ? (
-        tasks.map((task, idx) => (
-          <TaskEntry
-            key={idx}
-            task={task}
-            setTask={partial(updateTask, tasks, setTasks, idx)}
-            setChecked={partial(
-              toggleCompleted,
-              tasks,
-              setTasks,
-              doneTasks,
-              setDoneTasks,
-              idx,
-            )}
-            setDeleted={partial(deleteTask, tasks, setTasks, idx)}
-          />
-        ))
-      ) : (
-        <p>Looks like you have some free time :)</p>
-      )}
-      <CompletedTasks
-        tasks={doneTasks}
-        setTask={partial(updateTask, doneTasks, setDoneTasks)}
-        setChecked={partial(
-          toggleCompleted,
-          doneTasks,
-          setDoneTasks,
-          tasks,
-          setTasks,
+  let body;
+  if (logUser !== null) {
+    body = (
+      <>
+        <LogoutFailedWarning failed={loginError !== null}>
+          Logout failed
+        </LogoutFailedWarning>
+        {tasks.length ? (
+          tasks.map((task, idx) => (
+            <TaskEntry
+              key={idx}
+              task={task}
+              setTask={partial(updateTask, tasks, setTasks, idx)}
+              setChecked={partial(
+                toggleCompleted,
+                tasks,
+                setTasks,
+                doneTasks,
+                setDoneTasks,
+                idx,
+              )}
+              setDeleted={partial(deleteTask, tasks, setTasks, idx)}
+            />
+          ))
+        ) : (
+          <NoTasksText>
+            Looks like you have some free time, {logUser} :)
+          </NoTasksText>
         )}
-        setDeleted={partial(deleteTask, doneTasks, setDoneTasks)}
-      />
-    </TasksListDiv>
-  );
+        <CompletedTasks
+          tasks={doneTasks}
+          setTask={partial(updateTask, doneTasks, setDoneTasks)}
+          setChecked={partial(
+            toggleCompleted,
+            doneTasks,
+            setDoneTasks,
+            tasks,
+            setTasks,
+          )}
+          setDeleted={partial(deleteTask, doneTasks, setDoneTasks)}
+        />
+      </>
+    );
+  } else {
+    body = <LoginPanel />;
+  }
+
+  return <TasksListDiv id="taskslist">{body}</TasksListDiv>;
 }
