@@ -54,35 +54,35 @@ export function useCached<T>(
   return [data, setData];
 }
 
-export function useQuery(key: string): {
-  param: option<string>;
-  setParam: Dispatch<SetStateAction<option<string>>>;
-} {
-  const [param, setParam] = useState<option<string>>(() => {
-    const queryParams = new URLSearchParams(window.location.search);
-    return queryParams.has(key) ? queryParams.get(key) : null;
-  });
+// export function useQuery(key: string): {
+//   param: option<string>;
+//   setParam: Dispatch<SetStateAction<option<string>>>;
+// } {
+//   const [param, setParam] = useState<option<string>>(() => {
+//     const queryParams = new URLSearchParams(window.location.search);
+//     return queryParams.has(key) ? queryParams.get(key) : null;
+//   });
 
-  useEffect(() => {
-    const queryParams = new URLSearchParams(window.location.search);
-    const set = param !== null;
+//   useEffect(() => {
+//     const queryParams = new URLSearchParams(window.location.search);
+//     const set = param !== null;
 
-    if (set) queryParams.set(key, param as string);
-    else queryParams.delete(key);
+//     if (set) queryParams.set(key, param as string);
+//     else queryParams.delete(key);
 
-    window.history.replaceState(
-      null,
-      key,
-      `?${queryParams.toString()}${window.location.hash}`,
-    );
-  }, [param, key]);
+//     window.history.replaceState(
+//       null,
+//       key,
+//       `?${queryParams.toString()}${window.location.hash}`,
+//     );
+//   }, [param, key]);
 
-  return { param, setParam };
-}
+//   return { param, setParam };
+// }
 
 export function useLoginError() {
-  const { param, setParam } = useQuery('loginerror');
-  return { loginError: param, setLoginError: setParam };
+  const [data, setData] = useCached<option<string>>('loginerror', null);
+  return { loginError: data, setLoginError: setData };
 }
 
 export const HomeCheckbox = withStyles(

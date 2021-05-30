@@ -394,9 +394,6 @@ export function TasksList({
   if (logUser !== null) {
     body = (
       <>
-        <LogoutFailedWarning failed={loginError !== null}>
-          Logout failed
-        </LogoutFailedWarning>
         {tasks.length ? (
           tasks.map((task, idx) => (
             <TaskEntry
