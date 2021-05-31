@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import HomeSearch from './HomeSearch';
 import HomeTasks from './HomeTasks';
 import { PAGE_HUE_MAX, PAGE_HUE_MIN } from './config';
-import { LoginStore, AddTaskStore } from './utils';
+import { AddTaskStore, LoginStore } from './utils';
 
 export default function App() {
   useEffect(() => {

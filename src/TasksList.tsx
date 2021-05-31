@@ -6,7 +6,7 @@ import {
   TASK_UPDATE_DELAY,
 } from './config';
 import update from 'immutability-helper';
-import { useCallback, useEffect, useState } from 'react';
+import { ReactElement, useCallback, useEffect, useState } from 'react';
 import {
   HomeCheckbox,
   HomeDateTimePicker,
@@ -14,7 +14,6 @@ import {
   partial,
   useAddTask,
   useLogin,
-  useLoginError,
 } from './utils';
 import styled from 'styled-components';
 import { LoginPanel } from './LoginPanel';
@@ -198,18 +197,18 @@ const TasksListDiv = styled.div`
   text-align: center;
 `;
 
-type LogoutFailedWarningProps = {
-  failed: boolean;
-};
+// type LogoutFailedWarningProps = {
+//   failed: boolean;
+// };
 
-const LogoutFailedWarning = styled.span<LogoutFailedWarningProps>`
-  margin: 0 0 5px 0;
+// const LogoutFailedWarning = styled.span<LogoutFailedWarningProps>`
+//   margin: 0 0 5px 0;
 
-  display: ${(props) => (props.failed ? 'inherit' : 'none')};
+//   display: ${(props) => (props.failed ? 'inherit' : 'none')};
 
-  color: red;
-  font-size: 0.8em;
-`;
+//   color: red;
+//   font-size: 0.8em;
+// `;
 
 const NoTasksText = styled.p`
   margin: 20px 5px;
@@ -227,8 +226,7 @@ export function TasksList({
   setCompleted: (t: Task[]) => void;
 }) {
   const { setAddTask } = useAddTask();
-  const { logUser } = useLogin();
-  const { loginError } = useLoginError();
+  const { loggedIn } = useLogin();
 
   const addTask = useCallback(
     (task: NewTask) => {
@@ -390,8 +388,8 @@ export function TasksList({
       .catch((e) => console.log(e));
   }
 
-  let body;
-  if (logUser !== null) {
+  let body: ReactElement;
+  if (loggedIn) {
     body = (
       <>
         {tasks.length ? (
@@ -413,7 +411,7 @@ export function TasksList({
           ))
         ) : (
           <NoTasksText>
-            Looks like you have some free time, {logUser} :)
+            Looks like you have some free time, FIXME :)
           </NoTasksText>
         )}
         <CompletedTasks

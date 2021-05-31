@@ -1,6 +1,7 @@
 import {
   createContext,
   Dispatch,
+  ReactElement,
   SetStateAction,
   useContext,
   useEffect,
@@ -22,7 +23,7 @@ import {
   MuiPickersUtilsProvider,
 } from '@material-ui/pickers';
 import DayJsUtils from '@date-io/dayjs';
-import { NewTask, option } from './config';
+import { NewTask } from './config';
 
 type Arr = readonly unknown[];
 export function partial<T extends Arr, U extends Arr, R>(
@@ -80,10 +81,10 @@ export function useCached<T>(
 //   return { param, setParam };
 // }
 
-export function useLoginError() {
-  const [data, setData] = useCached<option<string>>('loginerror', null);
-  return { loginError: data, setLoginError: setData };
-}
+// export function useLoginError() {
+//   const [data, setData] = useCached<option<string>>('loginerror', null);
+//   return { loginError: data, setLoginError: setData };
+// }
 
 export const HomeCheckbox = withStyles(
   {
@@ -239,24 +240,30 @@ export function HomeDateTimePicker(props: DateTimePickerProps) {
 // Context stuff
 
 type LoginContextType = {
-  logUser: option<string>;
-  setLogUser: Dispatch<option<string>>;
+  loggedIn: boolean;
+  setLoggedIn: Dispatch<boolean>;
 };
 
 export const LoginContext = createContext<LoginContextType>({
-  logUser: null,
-  setLogUser: () => {},
+  loggedIn: false,
+  setLoggedIn: () => {},
 });
 
 export function LoginStore({
   children,
 }: {
-  children: JSX.Element | JSX.Element[];
+  children: ReactElement | ReactElement[];
 }) {
-  const [logUser, setLogUser] = useCached<option<string>>('loguser', null);
+  const [loggedIn, setLoggedIn] = useState(false);
+
+  useEffect(() => {
+    console.log('loggedIn', loggedIn);
+  }, [loggedIn]);
 
   return (
-    <LoginContext.Provider value={{ logUser: logUser, setLogUser: setLogUser }}>
+    <LoginContext.Provider
+      value={{ loggedIn: loggedIn, setLoggedIn: setLoggedIn }}
+    >
       {children}
     </LoginContext.Provider>
   );
@@ -278,7 +285,7 @@ export const AddTaskContext = createContext<AddTaskContextType>({
 export function AddTaskStore({
   children,
 }: {
-  children: JSX.Element | JSX.Element[];
+  children: ReactElement | ReactElement[];
 }) {
   const [state, dispatch] = useReducer(
     (_: AddTask, a: AddTask) => a,

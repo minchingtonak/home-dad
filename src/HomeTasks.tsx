@@ -1,9 +1,10 @@
 import { useEffect } from 'react';
-import { Task, TASKS_API_URL } from './config';
+import { Task } from './config';
 import { TasksBar } from './TasksBar';
 import { TasksList } from './TasksList';
-import { useCached, useLogin } from './utils';
+import { useCached } from './utils';
 import styled from 'styled-components';
+import { useGoogleAPI } from './auth';
 
 const TasksMainDiv = styled.div`
   width: var(--section-width);
@@ -23,29 +24,29 @@ const TasksMainDiv = styled.div`
 export default function HomeTasks() {
   const [tasks, setTasks] = useCached<Task[]>('tasks', []);
   const [completed, setCompleted] = useCached<Task[]>('completed', []);
-  const { logUser } = useLogin();
+  const { loggedIn } = useGoogleAPI();
 
   useEffect(() => {
-    if (logUser !== null)
-      fetch(`${TASKS_API_URL}?completed=false`, {
-        method: 'GET',
-        credentials: 'same-origin',
-      })
-        .then((res) => res.json())
-        .then((data) => setTasks(data.tasks))
-        .catch((e) => console.log(e));
-  }, [logUser, setTasks]);
+    // if (loggedIn)
+    //   fetch(`${TASKS_API_URL}?completed=false`, {
+    //     method: 'GET',
+    //     credentials: 'same-origin',
+    //   })
+    //     .then((res) => res.json())
+    //     .then((data) => setTasks(data.tasks))
+    //     .catch((e) => console.log(e));
+  }, [loggedIn, setTasks]);
 
   useEffect(() => {
-    if (logUser !== null)
-      fetch(`${TASKS_API_URL}?completed=true`, {
-        method: 'GET',
-        credentials: 'same-origin',
-      })
-        .then((res) => res.json())
-        .then((data) => setCompleted(data.tasks))
-        .catch((e) => console.log(e));
-  }, [logUser, setCompleted]);
+    // if (logUser !== null)
+    //   fetch(`${TASKS_API_URL}?completed=true`, {
+    //     method: 'GET',
+    //     credentials: 'same-origin',
+    //   })
+    //     .then((res) => res.json())
+    //     .then((data) => setCompleted(data.tasks))
+    //     .catch((e) => console.log(e));
+  }, [setCompleted]);
 
   return (
     <TasksMainDiv id="tasksmain">
