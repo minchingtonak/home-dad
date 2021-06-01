@@ -1,7 +1,39 @@
 import { useCallback, useEffect, useState } from 'react';
 import validator from 'validator';
 import { Sites, option, SITES_DATA_URL } from './config';
-import { getValidURL } from './util';
+import { getValidURL, useCached } from './utils';
+import styled from 'styled-components';
+
+const SectionContainer = styled.div`
+  vertical-align: top;
+
+  display: inline-block;
+
+  overflow: hidden;
+
+  box-sizing: border-box;
+  margin: 2px;
+  height: var(--section-height);
+  width: var(--section-width);
+
+  background-color: var(--hdr);
+
+  text-align: left;
+  color: var(--htx);
+
+  &:before {
+    content: '';
+    margin-left: 5px;
+  }
+`;
+
+const LinksWrapper = styled.div`
+  padding: 10px 15px 15px 10px;
+
+  height: 100%;
+
+  background-color: var(--frg);
+`;
 
 function Section({
   title,
@@ -11,14 +43,31 @@ function Section({
   children: JSX.Element[];
 }) {
   return children.length ? (
-    <div id={title} className={'section'}>
+    <SectionContainer id={title}>
       {title}
-      <div>{children}</div>
-    </div>
+      <LinksWrapper>{children}</LinksWrapper>
+    </SectionContainer>
   ) : (
     <></>
   );
 }
+
+const Link = styled.a`
+  margin-bottom: var(--link-margin);
+  padding-left: 5px;
+
+  display: block;
+
+  color: var(--txt);
+  text-decoration: none;
+
+  &:hover,
+  &.selected {
+    background-color: rgba(255, 255, 255, 0.05);
+
+    color: var(--hgl);
+  }
+`;
 
 export default function LinkSections({
   query,
@@ -27,7 +76,7 @@ export default function LinkSections({
   query: string;
   setAction: (s: option<string>) => void;
 }) {
-  const [sites, setSites] = useState<option<Sites>>(null);
+  const [sites, setSites] = useCached<option<Sites>>('sites', null);
   const [sections, setSections] = useState<JSX.Element[]>([]);
   const [selected, setSelected] = useState<option<number>>(null);
   const [totalMatched, setTotalMatched] = useState(0);
@@ -35,19 +84,21 @@ export default function LinkSections({
   useEffect(() => {
     fetch(SITES_DATA_URL)
       .then((res) => res.json())
-      .then((data) => {
-        setSites(data);
-        document.documentElement.style.setProperty(
-          '--max-links',
-          `${Math.max(
-            ...Object.keys(data).map(
-              (category) => Object.keys(data[category]).length,
-            ),
-          )}`,
-        );
-      })
+      .then((data) => setSites(data))
       .catch((err) => console.error(err));
-  }, []);
+  }, [setSites]);
+
+  useEffect(() => {
+    if (sites !== null)
+      document.documentElement.style.setProperty(
+        '--max-links',
+        `${Math.max(
+          ...Object.keys(sites).map(
+            (category) => Object.keys(sites[category]).length,
+          ),
+        )}`,
+      );
+  }, [sites]);
 
   const updateSections = useCallback(
     function (newSelected: option<number>) {
@@ -71,13 +122,13 @@ export default function LinkSections({
                 if (isSelected) setAction(links[name]);
 
                 return (
-                  <a
+                  <Link
                     key={idx}
                     href={getValidURL(links[name])}
                     className={isSelected ? 'selected' : ''}
                   >
                     {name}
-                  </a>
+                  </Link>
                 );
               })}
             </Section>,
@@ -128,5 +179,5 @@ export default function LinkSections({
     };
   }, [selected, totalMatched, updateSections]);
 
-  return <div id={'links'}>{sections}</div>;
+  return <div id="links">{sections}</div>;
 }

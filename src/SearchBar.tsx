@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import styled from 'styled-components';
+import { useGoogleAPI } from './auth';
 import {
   DEFAULT_SEARCH_URL,
   DEFAULT_TAB_TITLE,
@@ -6,7 +8,42 @@ import {
   option,
   SEARCH_TAB_PREFIX,
 } from './config';
-import { getValidURL } from './util';
+import { getValidURL, HomeDatePicker, partial, useAddTask } from './utils';
+
+const SearchInput = styled.input`
+  margin: 0px 2px 2px 2px;
+  padding-left: 5px;
+  box-sizing: border-box;
+
+  border: none;
+  width: var(--lwidth);
+  height: 50px;
+
+  font-size: 40px;
+  background-color: var(--frg);
+  color: var(--txt);
+  font-family: Terminus, Montserrat;
+
+  &:focus {
+    outline: none;
+  }
+
+  @media screen and (max-width: 912px) {
+    & {
+      width: var(--mwidth);
+    }
+  }
+
+  @media screen and (max-width: 608px) {
+    & {
+      width: var(--swidth);
+    }
+  }
+`;
+
+const SearchDatePicker = styled(HomeDatePicker)`
+  display: none !important;
+`;
 
 export default function SearchBar({
   text,
@@ -18,13 +55,17 @@ export default function SearchBar({
   action: option<string>;
 }) {
   const input = useRef<HTMLInputElement>(null);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [taskText, setTaskText] = useState<option<string>>(null);
+  const { addTask } = useAddTask();
+  const { loggedIn, logOut, logIn } = useGoogleAPI();
 
-  useEffect(() => {
-    // Clikcing on anything except a link will focus the search bar
-    (document.querySelector('body') as HTMLBodyElement).onclick = (e) => {
-      if (input && input.current) input.current.focus();
-    };
-  }, [input]);
+  // useEffect(() => {
+  //   // Clikcing on anything except a link will focus the search bar
+  //   (document.querySelector('body') as HTMLBodyElement).onclick = (e) => {
+  //     if (input && input.current) input.current.focus();
+  //   };
+  // }, [input]);
 
   const updateTitle = useCallback(
     (start: string) => {
@@ -51,45 +92,60 @@ export default function SearchBar({
     };
   }, [updateTitle]);
 
-  const [ctrlPressed, setCtrlPressed] = useState(false);
-
-  useEffect(() => {
-    function toggle(e: KeyboardEvent) {
-      if (e.key === 'Control') setCtrlPressed(!ctrlPressed);
-    }
-    document.addEventListener('keydown', toggle);
-    document.addEventListener('keyup', toggle);
-
-    return () => {
-      document.removeEventListener('keydown', toggle);
-      document.removeEventListener('keyup', toggle);
-    };
-  }, [ctrlPressed]);
-
   return (
-    <form
-      id={'action'}
-      onSubmit={(e) => {
-        e.preventDefault();
-        // TODO - code to handle todo list commands
-        const travelTo = ctrlPressed
-          ? window.open
-          : window.location.assign.bind(window.location);
-        travelTo(
-          action !== null
-            ? getValidURL(action)
-            : `${DEFAULT_SEARCH_URL}?q=${text}`,
-        );
-      }}
-    >
-      <input
-        type="text"
-        value={text}
-        ref={input}
-        autoFocus
-        autoComplete={'off'}
-        onChange={(e) => setText(e.target.value)}
+    <>
+      <form
+        id={'action'}
+        onSubmit={(e) => {
+          e.preventDefault();
+
+          if (/^\/t(ask)?/.test(text)) {
+            const matches = text.match(/[\s].*/g);
+            setTaskText(matches !== null ? matches[0].trim() : null);
+            setPickerOpen(true);
+          } else if (/^\/login/.test(text)) {
+            if (loggedIn) return;
+            logIn();
+            setText('');
+          } else if (/^\/logout/.test(text)) {
+            if (!loggedIn) return;
+            logOut();
+            setText('');
+            window.localStorage.clear();
+          } else {
+            window.location.assign(
+              action !== null
+                ? getValidURL(action)
+                : `${DEFAULT_SEARCH_URL}?q=${encodeURIComponent(text)}`,
+            );
+          }
+        }}
+      >
+        <SearchInput
+          type="text"
+          value={text}
+          ref={input}
+          autoFocus
+          autoComplete="off"
+          onChange={(e) => setText(e.target.value)}
+        />
+      </form>
+      <SearchDatePicker
+        variant="dialog"
+        autoOk
+        okLabel={<></>}
+        cancelLabel={<></>}
+        value={new Date()}
+        open={pickerOpen}
+        onChange={() => {}}
+        onAccept={(d) => {
+          if (taskText !== null && d) {
+            addTask({ title: taskText, due: d.toISOString()});
+            setText('');
+          }
+        }}
+        onClose={partial(setPickerOpen, false)}
       />
-    </form>
+    </>
   );
 }
