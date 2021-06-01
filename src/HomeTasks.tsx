@@ -41,9 +41,11 @@ export default function HomeTasks() {
   useEffect(() => {
     if (loggedIn)
       try {
+        console.log('getting lists');
         gapi.client.tasks.tasklists
           ?.list()
           .then((data) => {
+            console.log('lists', data);
             if (data.statusText !== 'OK')
               throw Error('failed to get tasklists');
             if (data.result.items) {

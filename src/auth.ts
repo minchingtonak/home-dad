@@ -40,23 +40,29 @@ export function useGoogleAPI() {
   const [offlineAccess, setOfflineAccess] = useCached('offlineaccess', false);
 
   useEffect(() => {
-    gapi.load('client:auth2', () => {
-      initClient((status) => {
-        setLoggedIn(status);
-        setTimeout(() => {
-          if (status && !offlineAccess)
-            gapi.auth2
-              .getAuthInstance()
-              .currentUser.get()
-              .grantOfflineAccess({ scope: TASKS_SCOPE, prompt: 'consent' })
-              .then(({ code }) => {
-                setOfflineAccess(true);
-              });
-        }, 5000);
+    if (!loggedIn)
+      gapi.load('client:auth2', () => {
+        initClient((status) => {
+          setLoggedIn(status);
+          console.log('loggedin status', status);
+          // setTimeout(() => {
+          //   if (status && !offlineAccess)
+          //     gapi.auth2
+          //       .getAuthInstance()
+          //       .currentUser.get()
+          //       .grantOfflineAccess({ scope: TASKS_SCOPE, prompt: 'consent' })
+          //       .then(({ code }) => {
+          //         setOfflineAccess(true);
+          //       });
+          // }, 5000);
+        });
+        setClientInit(true);
       });
-      setClientInit(true);
-    });
-  }, [setLoggedIn, offlineAccess, setOfflineAccess]);
+  }, [loggedIn, setLoggedIn, offlineAccess, setOfflineAccess]);
+
+  useEffect(() => {
+    console.log(loggedIn);
+  }, [loggedIn]);
 
   const authInstance = clientInit
     ? gapi.auth2.getAuthInstance()
@@ -73,6 +79,6 @@ export function useGoogleAPI() {
           .currentUser.get()
           .getBasicProfile()
           .getGivenName()
-      : '',
+      : null,
   };
 }
