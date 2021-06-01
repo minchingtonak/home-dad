@@ -34,7 +34,7 @@ export function partial<T extends Arr, U extends Arr, R>(
 }
 
 export function getValidURL(link: string): string {
-  return /^https?:\/\//.test(link) !== null ? link : `//${link}`;
+  return /^https?:\/\//.test(link) ? link : `//${link}`;
 }
 
 const ls = window.localStorage;
