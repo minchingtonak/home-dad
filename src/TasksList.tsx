@@ -200,19 +200,6 @@ const TasksListDiv = styled.div`
   text-align: center;
 `;
 
-// type LogoutFailedWarningProps = {
-//   failed: boolean;
-// };
-
-// const LogoutFailedWarning = styled.span<LogoutFailedWarningProps>`
-//   margin: 0 0 5px 0;
-
-//   display: ${(props) => (props.failed ? 'inherit' : 'none')};
-
-//   color: red;
-//   font-size: 0.8em;
-// `;
-
 const NoTasksText = styled.p`
   margin: 20px 5px;
 `;
@@ -304,8 +291,6 @@ export function TasksList({
     idx: number,
   ) {
     // delete the task
-    // console.log(gapi.client.tasks.tasks);
-    // console.log(gapi.client.tasks.tasklists);
     try {
       gapi.client.tasks.tasks
         ?.delete({ tasklist: listId, task: taskId })

@@ -44,25 +44,20 @@ export function useGoogleAPI() {
       gapi.load('client:auth2', () => {
         initClient((status) => {
           setLoggedIn(status);
-          console.log('loggedin status', status);
-          // setTimeout(() => {
-          //   if (status && !offlineAccess)
-          //     gapi.auth2
-          //       .getAuthInstance()
-          //       .currentUser.get()
-          //       .grantOfflineAccess({ scope: TASKS_SCOPE, prompt: 'consent' })
-          //       .then(({ code }) => {
-          //         setOfflineAccess(true);
-          //       });
-          // }, 5000);
+          setTimeout(() => {
+            if (status && !offlineAccess)
+              gapi.auth2
+                .getAuthInstance()
+                .currentUser.get()
+                .grantOfflineAccess({ scope: TASKS_SCOPE, prompt: 'consent' })
+                .then(({ code }) => {
+                  setOfflineAccess(true);
+                });
+          }, 5000);
         });
         setClientInit(true);
       });
   }, [loggedIn, setLoggedIn, offlineAccess, setOfflineAccess]);
-
-  useEffect(() => {
-    console.log(loggedIn);
-  }, [loggedIn]);
 
   const authInstance = clientInit
     ? gapi.auth2.getAuthInstance()

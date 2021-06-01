@@ -1,11 +1,11 @@
 import { useEffect } from 'react';
+import styled from 'styled-components';
+import { gapi } from 'gapi-script';
+import { useGoogleAPI } from './auth';
 import { Task, TaskList } from './config';
+import { useCached } from './utils';
 import { TasksBar } from './TasksBar';
 import { TasksList } from './TasksList';
-import { useCached } from './utils';
-import styled from 'styled-components';
-import { useGoogleAPI } from './auth';
-import { gapi } from 'gapi-script';
 
 const TasksMainDiv = styled.div`
   width: var(--section-width);
@@ -41,11 +41,9 @@ export default function HomeTasks() {
   useEffect(() => {
     if (loggedIn)
       try {
-        console.log('getting lists');
         gapi.client.tasks.tasklists
           ?.list()
           .then((data) => {
-            console.log('lists', data);
             if (data.statusText !== 'OK')
               throw Error('failed to get tasklists');
             if (data.result.items) {
