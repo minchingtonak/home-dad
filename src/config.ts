@@ -10,19 +10,21 @@ export const DEFAULT_SEARCH_URL = 'https://google.com/search';
 export const SITES_DATA_URL =
   'https://gist.githubusercontent.com/minchingtonak/b60356be980dc4f430fe73b523d1fafb/raw';
 
-export const TASKS_API_URL = 'https://tasks.googleapis.com/tasks/v1/';
 export const TASK_UPDATE_DELAY = 500; // ms
-export const TASK_DELETE_DELAY = 500; // ms
 
 export type option<T> = T | null;
+
 export type Sites = { [k: string]: { [k: string]: string } };
-export interface NewTask {
-  text: string;
-  due: Date;
-}
-export interface Task extends NewTask {
-  completed: boolean;
-  _id: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
+
+// export type TaskLinks = Required<gapi.client.Tasks.Schema.TaskLinks>;
+// export type TaskList = Required<gapi.client.Tasks.Schema.TaskList>;
+// export type TaskLists = Required<gapi.client.Tasks.Schema.TaskLists>;
+// export type Tasks = Required<gapi.client.Tasks.Schema.Tasks>;
+// export type Task = Required<gapi.client.Tasks.Schema.Task>;
+// export type Task = Required<gapi.client.Tasks.Schema.Task>;
+
+export interface TaskLinks extends gapi.client.Tasks.Schema.TaskLinks {}
+export interface TaskList extends gapi.client.Tasks.Schema.TaskList {}
+export interface TaskLists extends gapi.client.Tasks.Schema.TaskLists {}
+export interface Tasks extends gapi.client.Tasks.Schema.Tasks {}
+export type Task = gapi.client.Tasks.Schema.Task;

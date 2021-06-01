@@ -1,10 +1,11 @@
 import { useEffect } from 'react';
-import { Task } from './config';
+import { Task, TaskList } from './config';
 import { TasksBar } from './TasksBar';
 import { TasksList } from './TasksList';
 import { useCached } from './utils';
 import styled from 'styled-components';
 import { useGoogleAPI } from './auth';
+import { gapi } from 'gapi-script';
 
 const TasksMainDiv = styled.div`
   width: var(--section-width);
@@ -22,40 +23,79 @@ const TasksMainDiv = styled.div`
 `;
 
 export default function HomeTasks() {
+  const [tasklists, setTaskLists] = useCached<TaskList[]>('tasklists', []);
+  const [activeList, setActiveList] = useCached<TaskList>('activelist', {});
+
   const [tasks, setTasks] = useCached<Task[]>('tasks', []);
   const [completed, setCompleted] = useCached<Task[]>('completed', []);
   const { loggedIn } = useGoogleAPI();
 
   useEffect(() => {
-    // if (loggedIn)
-    //   fetch(`${TASKS_API_URL}?completed=false`, {
-    //     method: 'GET',
-    //     credentials: 'same-origin',
-    //   })
-    //     .then((res) => res.json())
-    //     .then((data) => setTasks(data.tasks))
-    //     .catch((e) => console.log(e));
-  }, [loggedIn, setTasks]);
+    setTasks(
+      tasks.sort((a, b) =>
+        a.position && b.position ? a.position.localeCompare(b.position) : 0,
+      ),
+    );
+  }, [tasks, setTasks]);
 
   useEffect(() => {
-    // if (logUser !== null)
-    //   fetch(`${TASKS_API_URL}?completed=true`, {
-    //     method: 'GET',
-    //     credentials: 'same-origin',
-    //   })
-    //     .then((res) => res.json())
-    //     .then((data) => setCompleted(data.tasks))
-    //     .catch((e) => console.log(e));
-  }, [setCompleted]);
+    if (loggedIn)
+      try {
+        gapi.client.tasks.tasklists
+          ?.list()
+          .then((data) => {
+            if (data.statusText !== 'OK')
+              throw Error('failed to get tasklists');
+            if (data.result.items) {
+              setTaskLists(data.result.items);
+              if (activeList.title === undefined)
+                setActiveList(data.result.items[0]);
+            }
+          })
+          .catch((err) => {
+            console.error(err);
+          });
+      } catch (err) {
+        console.error(err);
+      }
+  }, [loggedIn, setTaskLists, setActiveList, activeList.title]);
+
+  useEffect(() => {
+    if (loggedIn && activeList.id)
+      try {
+        gapi.client.tasks.tasks
+          ?.list({
+            tasklist: activeList.id,
+            showCompleted: true,
+            maxResults: 100,
+          })
+          .then((data) => {
+            if (data.statusText !== 'OK')
+              throw Error(`failed to get tasks for list ${activeList.title}`);
+
+            const list = data.result.items || [];
+            setTasks(list.filter((elt) => elt.completed === undefined));
+            setCompleted(list.filter((elt) => elt.completed));
+          })
+          .catch((err) => console.error(err));
+      } catch (err) {
+        console.error(err);
+      }
+  }, [loggedIn, setTasks, setCompleted, activeList.id, activeList.title]);
 
   return (
     <TasksMainDiv id="tasksmain">
-      <TasksBar />
+      <TasksBar
+        tasklists={tasklists}
+        activeList={activeList}
+        setActiveList={setActiveList}
+      />
       <TasksList
         tasks={tasks}
         setTasks={setTasks}
         completed={completed}
         setCompleted={setCompleted}
+        activeTaskList={activeList}
       />
     </TasksMainDiv>
   );

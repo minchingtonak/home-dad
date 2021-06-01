@@ -8,7 +8,7 @@ import {
   option,
   SEARCH_TAB_PREFIX,
 } from './config';
-import { getValidURL, HomeDateTimePicker, partial, useAddTask } from './utils';
+import { getValidURL, HomeDatePicker, partial, useAddTask } from './utils';
 
 const SearchInput = styled.input`
   margin: 0px 2px 2px 2px;
@@ -41,7 +41,7 @@ const SearchInput = styled.input`
   }
 `;
 
-const SearchDateTimePicker = styled(HomeDateTimePicker)`
+const SearchDatePicker = styled(HomeDatePicker)`
   display: none !important;
 `;
 
@@ -104,12 +104,14 @@ export default function SearchBar({
             setTaskText(matches !== null ? matches[0].trim() : null);
             setPickerOpen(true);
           } else if (/^\/login/.test(text)) {
+            if (loggedIn) return;
             logIn();
             setText('');
           } else if (/^\/logout/.test(text)) {
+            if (!loggedIn) return;
             logOut();
             setText('');
-            // TODO clear all login related data
+            window.localStorage.clear();
           } else {
             window.location.assign(
               action !== null
@@ -128,10 +130,9 @@ export default function SearchBar({
           onChange={(e) => setText(e.target.value)}
         />
       </form>
-      <SearchDateTimePicker
+      <SearchDatePicker
         variant="dialog"
         autoOk
-        hideTabs={true}
         okLabel={<></>}
         cancelLabel={<></>}
         value={new Date()}
@@ -139,7 +140,7 @@ export default function SearchBar({
         onChange={() => {}}
         onAccept={(d) => {
           if (taskText !== null && d) {
-            addTask({ text: taskText, due: d.toDate() });
+            addTask({ title: taskText, due: d.toISOString()});
             setText('');
           }
         }}

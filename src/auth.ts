@@ -1,16 +1,15 @@
 import { useEffect, useState } from 'react';
 import { gapi } from 'gapi-script';
-import { useLogin } from './utils';
+import { useCached, useLogin } from './utils';
 
-// TODO use dotenv for these
 const CLIENT_ID =
-  '127110911213-b8q7v0qff6k5jsrubph4h66qr7h61otj.apps.googleusercontent.com';
-const API_KEY = 'AIzaSyBsr4tYkit6enDK16_NX9xrAH3hu7xUbmk';
+  '529992368744-omh87l4imgosp83f9l67toav9rgl2bru.apps.googleusercontent.com';
+const API_KEY = 'AIzaSyBZJJOMt3MkTKNiTgX8lRAkRx8Nd0A8lTc';
 
 const TASKS_DISCOVERY_DOCS = [
   'https://www.googleapis.com/discovery/v1/apis/tasks/v1/rest',
 ];
-const TASKS_SCOPES = 'https://www.googleapis.com/auth/tasks';
+const TASKS_SCOPE = 'https://www.googleapis.com/auth/tasks';
 
 let called = false;
 
@@ -22,11 +21,9 @@ function initClient(updateLoggedInStatus: (status: boolean) => void) {
       apiKey: API_KEY,
       clientId: CLIENT_ID,
       discoveryDocs: TASKS_DISCOVERY_DOCS,
-      scope: TASKS_SCOPES,
+      scope: TASKS_SCOPE,
     })
     .then(() => {
-      console.log('gapi.auth2', gapi.auth2);
-
       gapi.auth2.getAuthInstance().isSignedIn.listen(updateLoggedInStatus);
 
       // initial sign in
@@ -40,16 +37,26 @@ function initClient(updateLoggedInStatus: (status: boolean) => void) {
 export function useGoogleAPI() {
   const { loggedIn, setLoggedIn } = useLogin();
   const [clientInit, setClientInit] = useState(false);
+  const [offlineAccess, setOfflineAccess] = useCached('offlineaccess', false);
 
   useEffect(() => {
     gapi.load('client:auth2', () => {
       initClient((status) => {
         setLoggedIn(status);
+        setTimeout(() => {
+          if (status && !offlineAccess)
+            gapi.auth2
+              .getAuthInstance()
+              .currentUser.get()
+              .grantOfflineAccess({ scope: TASKS_SCOPE, prompt: 'consent' })
+              .then(({ code }) => {
+                setOfflineAccess(true);
+              });
+        }, 5000);
       });
       setClientInit(true);
-      console.log(gapi.client);
     });
-  }, []);
+  }, [setLoggedIn, offlineAccess, setOfflineAccess]);
 
   const authInstance = clientInit
     ? gapi.auth2.getAuthInstance()
@@ -60,5 +67,12 @@ export function useGoogleAPI() {
     setLoggedIn: setLoggedIn,
     logIn: authInstance.signIn,
     logOut: authInstance.signOut,
+    username: loggedIn
+      ? gapi.auth2
+          .getAuthInstance()
+          .currentUser.get()
+          .getBasicProfile()
+          .getGivenName()
+      : '',
   };
 }

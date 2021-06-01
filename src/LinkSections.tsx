@@ -85,7 +85,7 @@ export default function LinkSections({
     fetch(SITES_DATA_URL)
       .then((res) => res.json())
       .then((data) => setSites(data))
-      .catch((err) => console.log(err));
+      .catch((err) => console.error(err));
   }, [setSites]);
 
   useEffect(() => {

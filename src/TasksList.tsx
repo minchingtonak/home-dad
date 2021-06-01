@@ -1,22 +1,16 @@
-import {
-  NewTask,
-  Task,
-  TASKS_API_URL,
-  TASK_DELETE_DELAY,
-  TASK_UPDATE_DELAY,
-} from './config';
-import update from 'immutability-helper';
 import { ReactElement, useCallback, useEffect, useState } from 'react';
+import update from 'immutability-helper';
+import styled from 'styled-components';
+import dayjs from 'dayjs';
+import { Task, TaskList, TASK_UPDATE_DELAY } from './config';
 import {
   HomeCheckbox,
-  HomeDateTimePicker,
+  HomeDatePicker,
   HomeMaterialInput,
   partial,
   useAddTask,
-  useLogin,
 } from './utils';
-import styled from 'styled-components';
-import { LoginPanel } from './LoginPanel';
+import { useGoogleAPI } from './auth';
 
 const TaskEntryDiv = styled.div`
   margin: 0 5px 5px 5px;
@@ -50,6 +44,10 @@ const TrashIcon = styled.i.attrs({ className: 'far fa-trash-alt fa-lg' })`
   transform: scale(0.96);
 
   color: var(--htx);
+
+  &:hover {
+    color: var(--txt);
+  }
 `;
 
 const DueDateDiv = styled.div`
@@ -65,7 +63,7 @@ const DueIcon = styled.i.attrs({ className: 'far fa-clock' })`
   color: var(--htx);
 `;
 
-const TaskDateTimePicker = styled(HomeDateTimePicker)`
+const TaskDatePicker = styled(HomeDatePicker)`
   transform: scale(0.88) translateX(-13px);
 `;
 
@@ -82,24 +80,29 @@ function TaskEntry({
 }) {
   return (
     <TaskEntryDiv className="taskentry">
-      <HomeCheckbox checked={task.completed} onChange={setChecked} />
+      <HomeCheckbox
+        checked={task.completed !== undefined}
+        onChange={setChecked}
+      />
       <TaskUIDiv>
         <TaskDescInput
-          value={task.text}
-          error={task.text === ''}
+          value={task.title}
+          error={task.title === ''}
           placeholder="Description cannot be empty"
-          onChange={(e) => setTask({ text: e.target.value })}
+          onChange={(e) => setTask({ title: e.target.value })}
         />
         <DueDateDiv>
           <DueIcon />
-          <TaskDateTimePicker
+          <TaskDatePicker
             variant="inline"
             autoOk
-            ampm={false}
-            hideTabs={true}
-            value={task.due}
-            format={'ddd, MMM D [at] H:mm'}
-            onChange={(d) => setTask({ due: d?.toDate() })}
+            // IDK why the offset here isn't the same as the native tasks clients
+            value={task.due ? dayjs(task.due).add(12, 'hour') : null}
+            format={'dddd, MMM D'}
+            onAccept={(d) => {
+              setTask({ due: d?.toISOString() });
+            }}
+            onChange={() => {}}
           />
         </DueDateDiv>
       </TaskUIDiv>
@@ -153,9 +156,9 @@ function CompletedTasks({
   setDeleted,
 }: {
   tasks: Task[];
-  setTask: (idx: number, t: Partial<Task>) => void;
-  setChecked: (idx: number) => void;
-  setDeleted: (idx: number) => void;
+  setTask: (taskId: string, idx: number, t: Partial<Task>) => void;
+  setChecked: (taskId: string, idx: number) => void;
+  setDeleted: (taskId: string, idx: number) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -174,9 +177,9 @@ function CompletedTasks({
             <TaskEntry
               key={idx}
               task={task}
-              setTask={partial(setTask, idx)}
-              setChecked={partial(setChecked, idx)}
-              setDeleted={partial(setDeleted, idx)}
+              setTask={partial(setTask, task.id as string, idx)}
+              setChecked={partial(setChecked, task.id as string, idx)}
+              setDeleted={partial(setDeleted, task.id as string, idx)}
             />
           ))
         : ''}
@@ -219,136 +222,104 @@ export function TasksList({
   setTasks,
   completed: doneTasks,
   setCompleted: setDoneTasks,
+  activeTaskList,
 }: {
   tasks: Task[];
   setTasks: (t: Task[]) => void;
   completed: Task[];
   setCompleted: (t: Task[]) => void;
+  activeTaskList: TaskList;
 }) {
   const { setAddTask } = useAddTask();
-  const { loggedIn } = useLogin();
+  const { loggedIn, username } = useGoogleAPI();
 
   const addTask = useCallback(
-    (task: NewTask) => {
-      fetch(TASKS_API_URL, {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(task),
-      })
-        .then((res) => res.json())
-        .then((task: Task) => {
-          setTasks(
-            update(tasks, { $push: [task] }).sort(
-              (a, b) => new Date(a.due).getTime() - new Date(b.due).getTime(),
-            ),
-          );
-        })
-        .catch((e) => console.log(e));
+    (task: Task) => {
+      try {
+        gapi.client.tasks.tasks
+          ?.insert({ resource: task, tasklist: activeTaskList.id as string })
+          .then((data) => {
+            if (data.statusText !== 'OK') throw Error('failed to add task');
+            setTasks(update(tasks, { $push: [data.result] }));
+          })
+          .catch((err) => console.error(err));
+      } catch (err) {
+        console.error(err);
+      }
     },
-    [tasks, setTasks],
+    [tasks, setTasks, activeTaskList.id],
   );
 
   useEffect(() => {
     setAddTask(addTask);
   }, [addTask, setAddTask]);
 
-  const [updateTimer, setUpdateTimer] = useState<number | undefined>(undefined);
-  const [toBeUpdated, setToBeUpdated] = useState<{
-    [k: string]: Partial<Task>;
-  }>({});
+  const [updateTimers, setUpdateTimers] = useState<{ [k: string]: number }>({});
 
   function updateTask(
     list: Task[],
     setList: (t: Task[]) => void,
+    listId: string,
+    taskId: string,
     idx: number,
-    t: Partial<Task>,
+    task: Partial<Task>,
   ) {
     // update local tasks list
     const updated = update(list, {
-      [idx]: { $merge: t },
+      [idx]: { $merge: task },
     });
-
     setList(updated);
-    const { createdAt, updatedAt, ...updatedTask } = updated[idx];
 
-    // add change to to be updated buffer to be sent to server
-    const newToBeUpdated =
-      updatedTask._id in toBeUpdated
-        ? update(toBeUpdated, {
-            [updatedTask._id]: { $merge: updatedTask },
-          })
-        : { ...toBeUpdated, [updatedTask._id]: updatedTask };
-    setToBeUpdated(newToBeUpdated);
+    // check if timer for this task id is already in updateTimers
+    const oldTaskTimer = updateTimers[taskId];
+    if (oldTaskTimer !== undefined)
+      // if it is, cancel it
+      clearTimeout(oldTaskTimer);
 
-    // reset countdown to sending update data
-    clearTimeout(updateTimer);
+    if (task.title === '') return;
 
-    if (updatedTask.text === '') return;
-    setUpdateTimer(
-      window.setTimeout(() => {
-        fetch(TASKS_API_URL, {
-          method: 'PATCH',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(
-            Object.keys(newToBeUpdated).map((id) => newToBeUpdated[id]),
-          ),
+    // schedule a new update
+    const newTaskTimer = window.setTimeout(() => {
+      gapi.client.tasks.tasks
+        ?.patch({ resource: task, tasklist: listId, task: taskId })
+        .then((data) => {
+          if (data.statusText !== 'OK')
+            throw Error(`failed to update task ${listId} : ${taskId}`);
+          // clear this task's timer
+          setUpdateTimers(update(updateTimers, { $unset: [taskId] }));
         })
-          .then((res) => res.json())
-          .then((data) => {
-            const l = Object.keys(newToBeUpdated).length;
-            if (data.updated !== l) {
-              console.error(
-                `failed to update  all tasks: ${data.updated} of ${l} were updated`,
-              );
-              return;
-            }
-            setToBeUpdated({});
-          })
-          .catch((e) => console.log(e));
-      }, TASK_UPDATE_DELAY),
+        .catch((err) => console.error(err));
+    }, TASK_UPDATE_DELAY);
+
+    setUpdateTimers(
+      update(updateTimers, { $merge: { [taskId]: newTaskTimer } }),
     );
   }
 
-  const [deleteTimer, setDeleteTimer] = useState<number | undefined>();
-  const [toDelete, setToDelete] = useState<string[]>([]);
+  function deleteTask(
+    list: Task[],
+    setList: (t: Task[]) => void,
+    listId: string,
+    taskId: string,
+    idx: number,
+  ) {
+    // delete the task
+    // console.log(gapi.client.tasks.tasks);
+    // console.log(gapi.client.tasks.tasklists);
+    try {
+      gapi.client.tasks.tasks
+        ?.delete({ tasklist: listId, task: taskId })
+        .then((data) => {
+          if (data.status !== 204)
+            throw Error(`failed to delete task ${listId} : ${taskId}`);
 
-  function deleteTask(list: Task[], setList: (t: Task[]) => void, idx: number) {
-    const updated = update(list, { $splice: [[idx, 1]] });
-    setList(updated);
-
-    const newToDelete = [...toDelete, list[idx]._id];
-    setToDelete(newToDelete);
-
-    clearTimeout(deleteTimer);
-    setDeleteTimer(
-      window.setTimeout(() => {
-        fetch(TASKS_API_URL, {
-          method: 'DELETE',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(newToDelete),
+          // update local copy
+          setList(update(list, { $splice: [[idx, 1]] }));
         })
-          .then((res) => res.json())
-          .then((data) => {
-            if (data.deleted !== newToDelete.length) {
-              console.error(
-                `failed to delete all tasks: ${data.deleted} of ${newToDelete.length} were deleted`,
-              );
-              return;
-            }
-            setToDelete([]);
-          })
-          .catch((e) => console.log(e));
-      }, TASK_DELETE_DELAY),
-    );
+        .catch((err) => console.error(err));
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   function toggleCompleted(
@@ -356,36 +327,41 @@ export function TasksList({
     setSrc: (t: Task[]) => void,
     dest: Task[],
     setDest: (t: Task[]) => void,
+    listId: string,
+    taskId: string,
     idx: number,
   ) {
-    // remove from src list
-    const newSrc = update(src, { $splice: [[idx, 1]] });
-    setSrc(newSrc);
+    // assemble updated task
+    const oldTask = src[idx];
+    const query = {
+      status: oldTask.status === 'completed' ? 'needsAction' : 'completed',
+    };
 
-    // add to dest list
-    const updatedTask = { ...src[idx], completed: !src[idx].completed };
-    const newDest = update(dest, {
-      $push: [updatedTask],
-    }).sort((a, b) => new Date(a.due).getTime() - new Date(b.due).getTime());
-    setDest(newDest);
-
-    // send patch to server
-    fetch(TASKS_API_URL, {
-      method: 'PATCH',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify([
-        { _id: updatedTask._id, completed: updatedTask.completed },
-      ]),
-    })
-      .then((res) => res.json())
+    // send update
+    gapi.client.tasks.tasks
+      ?.patch({ resource: query, tasklist: listId, task: taskId })
       .then((data) => {
-        if (data.updated !== 1)
-          console.error(`failed to set task ${updatedTask._id}`);
-      })
-      .catch((e) => console.log(e));
+        if (data.statusText !== 'OK')
+          throw Error(`failed to toggle task completed ${listId} : ${taskId}`);
+
+        // remove from src list
+        const newSrc = update(src, { $splice: [[idx, 1]] });
+        setSrc(newSrc);
+
+        // add to dest list
+        const newDest = update(dest, {
+          $push: [
+            update(
+              // update status, remove completed field if necessary
+              oldTask,
+              oldTask.status === 'completed'
+                ? { $unset: ['completed'], $merge: { status: 'needsAction' } }
+                : { $merge: { status: 'completed' } },
+            ),
+          ],
+        });
+        setDest(newDest);
+      });
   }
 
   let body: ReactElement;
@@ -397,39 +373,66 @@ export function TasksList({
             <TaskEntry
               key={idx}
               task={task}
-              setTask={partial(updateTask, tasks, setTasks, idx)}
+              setTask={partial(
+                updateTask,
+                tasks,
+                setTasks,
+                activeTaskList.id as string,
+                task.id as string,
+                idx,
+              )}
               setChecked={partial(
                 toggleCompleted,
                 tasks,
                 setTasks,
                 doneTasks,
                 setDoneTasks,
+                activeTaskList.id as string,
+                task.id as string,
                 idx,
               )}
-              setDeleted={partial(deleteTask, tasks, setTasks, idx)}
+              setDeleted={partial(
+                deleteTask,
+                tasks,
+                setTasks,
+                activeTaskList.id as string,
+                task.id as string,
+                idx,
+              )}
             />
           ))
         ) : (
           <NoTasksText>
-            Looks like you have some free time, FIXME :)
+            Looks like you have some free time, {username} :)
           </NoTasksText>
         )}
         <CompletedTasks
           tasks={doneTasks}
-          setTask={partial(updateTask, doneTasks, setDoneTasks)}
+          setTask={partial(
+            updateTask,
+            doneTasks,
+            setDoneTasks,
+            activeTaskList.id as string,
+          )}
           setChecked={partial(
             toggleCompleted,
             doneTasks,
             setDoneTasks,
             tasks,
             setTasks,
+            activeTaskList.id as string,
           )}
-          setDeleted={partial(deleteTask, doneTasks, setDoneTasks)}
+          setDeleted={partial(
+            deleteTask,
+            doneTasks,
+            setDoneTasks,
+            activeTaskList.id as string,
+          )}
         />
       </>
     );
   } else {
-    body = <LoginPanel />;
+    body = <p>Use /login to log into Tasks</p>;
   }
 
   return <TasksListDiv id="taskslist">{body}</TasksListDiv>;

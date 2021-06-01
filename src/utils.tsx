@@ -18,12 +18,12 @@ import {
   createMuiTheme,
 } from '@material-ui/core';
 import {
-  DateTimePicker,
-  DateTimePickerProps,
+  DatePicker,
+  DatePickerProps,
   MuiPickersUtilsProvider,
 } from '@material-ui/pickers';
 import DayJsUtils from '@date-io/dayjs';
-import { NewTask } from './config';
+import { Task } from './config';
 
 type Arr = readonly unknown[];
 export function partial<T extends Arr, U extends Arr, R>(
@@ -116,7 +116,14 @@ export const inputStyles = (txtcolor: string, linecolor: string) => ({
   },
   disabled: {},
   focused: {},
-  error: {},
+  error: {
+    '&:before': {
+      borderBottom: `1px solid red !important`,
+    },
+    '&:after': {
+      borderBottom: `3px solid red !important`,
+    },
+  },
 });
 
 // If you're wondering why everything in this theme is !important,
@@ -227,15 +234,25 @@ export const HomeMaterialInput = withStyles(
   },
 )((props: InputProps) => <Input {...props} />);
 
-export function HomeDateTimePicker(props: DateTimePickerProps) {
+export function HomeDatePicker(props: DatePickerProps) {
   return (
     <MuiPickersUtilsProvider utils={DayJsUtils}>
       <ThemeProvider theme={dateTimePickerTheme}>
-        <DateTimePicker {...props} />
+        <DatePicker {...props} />
       </ThemeProvider>
     </MuiPickersUtilsProvider>
   );
 }
+
+// export function HomeDateTimePicker(props: DateTimePickerProps) {
+//   return (
+//     <MuiPickersUtilsProvider utils={DayJsUtils}>
+//       <ThemeProvider theme={dateTimePickerTheme}>
+//         <DateTimePicker {...props} />
+//       </ThemeProvider>
+//     </MuiPickersUtilsProvider>
+//   );
+// }
 
 // Context stuff
 
@@ -256,10 +273,6 @@ export function LoginStore({
 }) {
   const [loggedIn, setLoggedIn] = useState(false);
 
-  useEffect(() => {
-    console.log('loggedIn', loggedIn);
-  }, [loggedIn]);
-
   return (
     <LoginContext.Provider
       value={{ loggedIn: loggedIn, setLoggedIn: setLoggedIn }}
@@ -271,14 +284,14 @@ export function LoginStore({
 
 export const useLogin = () => useContext(LoginContext);
 
-type AddTask = (t: NewTask) => void;
+type AddTask = (t: Task) => void;
 type AddTaskContextType = {
   addTask: AddTask;
   setAddTask: Dispatch<AddTask>;
 };
 
 export const AddTaskContext = createContext<AddTaskContextType>({
-  addTask: (t: NewTask) => {},
+  addTask: (t: Task) => {},
   setAddTask: () => {},
 });
 
@@ -289,7 +302,7 @@ export function AddTaskStore({
 }) {
   const [state, dispatch] = useReducer(
     (_: AddTask, a: AddTask) => a,
-    (t: NewTask) => {},
+    (t: Task) => {},
   );
 
   return (
