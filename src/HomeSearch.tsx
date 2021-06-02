@@ -5,6 +5,7 @@ import LinkSections from './LinkSections';
 import SearchBar from './SearchBar';
 import StaticLinks from './StaticLinks';
 import styled from 'styled-components';
+import { useQueryString } from './utils';
 
 const MainContainer = styled.div`
   // transition: 0.2s height;
@@ -16,7 +17,7 @@ const MainContainer = styled.div`
 `;
 
 export default function HomeSearch() {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useQueryString('q', '');
   const [action, setAction] = useState<option<string>>(null);
   const { height, ref } = useResizeDetector();
 

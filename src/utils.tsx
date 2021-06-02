@@ -3,6 +3,7 @@ import {
   Dispatch,
   ReactElement,
   SetStateAction,
+  useCallback,
   useContext,
   useEffect,
   useReducer,
@@ -23,6 +24,7 @@ import {
   MuiPickersUtilsProvider,
 } from '@material-ui/pickers';
 import DayJsUtils from '@date-io/dayjs';
+import qs from 'querystring';
 import { Task } from './config';
 
 type Arr = readonly unknown[];
@@ -53,6 +55,47 @@ export function useCached<T>(
   }, [data, key]);
 
   return [data, setData];
+}
+
+function parseQueryString(queryString = window.location.search) {
+  const values = qs.parse(queryString);
+
+  // Remove leading qmark from first query param
+  const qmarkKey = Object.keys(values).find((elt) => elt.startsWith('?'));
+  if (qmarkKey) {
+    const tmp = values[qmarkKey];
+    delete values[qmarkKey];
+    values[qmarkKey.slice(1)] = tmp;
+  }
+  return values;
+}
+
+function setQueryString(key: string, value: any) {
+  const newurl =
+    window.location.protocol +
+    '//' +
+    window.location.host +
+    window.location.pathname +
+    `?${qs.stringify({ ...parseQueryString(), [key]: value })}`;
+
+  window.history.pushState({ path: newurl }, '', newurl);
+}
+
+function getQueryStringValue(key: string) {
+  return parseQueryString()[key];
+}
+
+export function useQueryString(key: string, initialValue: any) {
+  const [value, setValue] = useState(getQueryStringValue(key) || initialValue);
+  const onSetValue = useCallback(
+    (newValue) => {
+      setValue(newValue);
+      setQueryString(key, newValue);
+    },
+    [key],
+  );
+
+  return [value, onSetValue];
 }
 
 // export function useQuery(key: string): {
