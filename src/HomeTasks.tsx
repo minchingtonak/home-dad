@@ -32,9 +32,15 @@ export default function HomeTasks() {
 
   useEffect(() => {
     setTasks(
-      tasks.sort((a, b) =>
-        a.position && b.position ? a.position.localeCompare(b.position) : 0,
-      ),
+      tasks.sort((a, b) => {
+        // sort by date, then by position
+        if (a.due && b.due)
+          return new Date(a.due).getTime() - new Date(b.due).getTime();
+        else if (a.position && b.position)
+          return a.position.localeCompare(b.position);
+
+        return 0;
+      }),
     );
   }, [tasks, setTasks]);
 
