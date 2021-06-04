@@ -144,7 +144,10 @@ export default function LinkSections({
   );
 
   useEffect(() => {
-    if (validator.isURL(query, { require_tld: false })) {
+    if (
+      validator.isURL(query) ||
+      /^(https?)?:\/\/localhost:\d{1,5}([^\d].*)?$/g.test(query)
+    ) {
       setAction(query);
       return;
     }
