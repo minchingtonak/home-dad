@@ -22,7 +22,15 @@ export default function HomeSearch() {
   const { height, ref } = useResizeDetector();
 
   useEffect(() => {
-    if (height !== undefined)
+    if (
+      height !== undefined &&
+      height >
+        parseInt(
+          getComputedStyle(document.documentElement)
+            .getPropertyValue('--homesearch-height')
+            .slice(0, -2),
+        )
+    )
       document.documentElement.style.setProperty(
         '--homesearch-height',
         `${height}px`,
