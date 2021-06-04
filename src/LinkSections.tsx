@@ -144,7 +144,7 @@ export default function LinkSections({
   );
 
   useEffect(() => {
-    if (validator.isURL(query)) {
+    if (validator.isURL(query, { require_tld: false })) {
       setAction(query);
       return;
     }

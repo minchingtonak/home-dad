@@ -71,12 +71,16 @@ function parseQueryString(queryString = window.location.search) {
 }
 
 function setQueryString(key: string, value: any) {
+  const parsed = parseQueryString();
+  if (key in parsed && !value) delete parsed[key];
+  else parsed[key] = value;
+
   const newurl =
     window.location.protocol +
     '//' +
     window.location.host +
     window.location.pathname +
-    `?${qs.stringify({ ...parseQueryString(), [key]: value })}`;
+    `${Object.keys(parsed).length ? '?' : ''}${qs.stringify(parsed)}`;
 
   window.history.pushState({ path: newurl }, '', newurl);
 }
@@ -98,37 +102,6 @@ export function useQueryString(key: string, initialValue: any) {
   return [value, onSetValue];
 }
 
-// export function useQuery(key: string): {
-//   param: option<string>;
-//   setParam: Dispatch<SetStateAction<option<string>>>;
-// } {
-//   const [param, setParam] = useState<option<string>>(() => {
-//     const queryParams = new URLSearchParams(window.location.search);
-//     return queryParams.has(key) ? queryParams.get(key) : null;
-//   });
-
-//   useEffect(() => {
-//     const queryParams = new URLSearchParams(window.location.search);
-//     const set = param !== null;
-
-//     if (set) queryParams.set(key, param as string);
-//     else queryParams.delete(key);
-
-//     window.history.replaceState(
-//       null,
-//       key,
-//       `?${queryParams.toString()}${window.location.hash}`,
-//     );
-//   }, [param, key]);
-
-//   return { param, setParam };
-// }
-
-// export function useLoginError() {
-//   const [data, setData] = useCached<option<string>>('loginerror', null);
-//   return { loginError: data, setLoginError: setData };
-// }
-
 export const HomeCheckbox = withStyles(
   {
     root: {
@@ -145,6 +118,14 @@ export const HomeCheckbox = withStyles(
 export const inputStyles = (txtcolor: string, linecolor: string) => ({
   root: {
     color: `${txtcolor} !important`,
+    '&$error': {
+      '&:before': {
+        borderBottom: '1px solid red !important',
+      },
+      '&:after': {
+        borderBottom: '3px solid red !important',
+      },
+    },
   },
   underline: {
     '&:before': {
@@ -159,14 +140,7 @@ export const inputStyles = (txtcolor: string, linecolor: string) => ({
   },
   disabled: {},
   focused: {},
-  error: {
-    '&:before': {
-      borderBottom: `1px solid red !important`,
-    },
-    '&:after': {
-      borderBottom: `3px solid red !important`,
-    },
-  },
+  error: {},
 });
 
 // If you're wondering why everything in this theme is !important,

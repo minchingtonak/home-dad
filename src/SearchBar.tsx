@@ -140,7 +140,7 @@ export default function SearchBar({
         onChange={() => {}}
         onAccept={(d) => {
           if (taskText !== null && d) {
-            addTask({ title: taskText, due: d.toISOString()});
+            addTask({ title: taskText, due: d.toISOString() });
             setText('');
           }
         }}
