@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import validator from 'validator';
+import isURL from 'validator/lib/isURL';
 import { Sites, option, SITES_DATA_URL } from './config';
 import { getValidURL, useCached } from './utils';
 import styled from 'styled-components';
@@ -145,7 +145,7 @@ export default function LinkSections({
 
   useEffect(() => {
     if (
-      validator.isURL(query) ||
+      isURL(query) ||
       /^(https?)?:\/\/localhost:\d{1,5}([^\d].*)?$/g.test(query)
     ) {
       setAction(query);

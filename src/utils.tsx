@@ -1,12 +1,8 @@
 import {
-  createContext,
   Dispatch,
-  ReactElement,
   SetStateAction,
   useCallback,
-  useContext,
   useEffect,
-  useReducer,
   useState,
 } from 'react';
 import {
@@ -25,6 +21,7 @@ import {
 } from '@material-ui/pickers';
 import DayJsUtils from '@date-io/dayjs';
 import qs from 'querystring';
+import create from 'zustand';
 import { Task } from './config';
 
 type Arr = readonly unknown[];
@@ -261,72 +258,21 @@ export function HomeDatePicker(props: DatePickerProps) {
   );
 }
 
-// export function HomeDateTimePicker(props: DateTimePickerProps) {
-//   return (
-//     <MuiPickersUtilsProvider utils={DayJsUtils}>
-//       <ThemeProvider theme={dateTimePickerTheme}>
-//         <DateTimePicker {...props} />
-//       </ThemeProvider>
-//     </MuiPickersUtilsProvider>
-//   );
-// }
-
 // Context stuff
 
-type LoginContextType = {
+export const useLogin = create<{
   loggedIn: boolean;
-  setLoggedIn: Dispatch<boolean>;
-};
-
-export const LoginContext = createContext<LoginContextType>({
+  setLoggedIn: (val: boolean) => void;
+}>((set) => ({
   loggedIn: false,
-  setLoggedIn: () => {},
-});
-
-export function LoginStore({
-  children,
-}: {
-  children: ReactElement | ReactElement[];
-}) {
-  const [loggedIn, setLoggedIn] = useState(false);
-
-  return (
-    <LoginContext.Provider
-      value={{ loggedIn: loggedIn, setLoggedIn: setLoggedIn }}
-    >
-      {children}
-    </LoginContext.Provider>
-  );
-}
-
-export const useLogin = () => useContext(LoginContext);
+  setLoggedIn: (val) => set({ loggedIn: val }),
+}));
 
 type AddTask = (t: Task) => void;
-type AddTaskContextType = {
+export const useAddTask = create<{
   addTask: AddTask;
-  setAddTask: Dispatch<AddTask>;
-};
-
-export const AddTaskContext = createContext<AddTaskContextType>({
-  addTask: (t: Task) => {},
-  setAddTask: () => {},
-});
-
-export function AddTaskStore({
-  children,
-}: {
-  children: ReactElement | ReactElement[];
-}) {
-  const [state, dispatch] = useReducer(
-    (_: AddTask, a: AddTask) => a,
-    (t: Task) => {},
-  );
-
-  return (
-    <AddTaskContext.Provider value={{ addTask: state, setAddTask: dispatch }}>
-      {children}
-    </AddTaskContext.Provider>
-  );
-}
-
-export const useAddTask = () => useContext(AddTaskContext);
+  setAddTask: (a: AddTask) => void;
+}>((set) => ({
+  addTask: () => {},
+  setAddTask: (a) => set({ addTask: a }),
+}));

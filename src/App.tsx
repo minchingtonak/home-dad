@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import HomeSearch from './HomeSearch';
 import HomeTasks from './HomeTasks';
 import { PAGE_HUE_MAX, PAGE_HUE_MIN } from './config';
-import { AddTaskStore, LoginStore } from './utils';
 
 export default function App() {
   useEffect(() => {
@@ -18,11 +17,9 @@ export default function App() {
   }, []);
 
   return (
-    <LoginStore>
-      <AddTaskStore>
-        <HomeSearch />
-        <HomeTasks />
-      </AddTaskStore>
-    </LoginStore>
+    <>
+      <HomeSearch />
+      <HomeTasks />
+    </>
   );
 }
