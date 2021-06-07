@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import App from './App';
 import './style.css';
 import './daypicker.css';
-// import { register } from './serviceWorkerRegistration';
+import { unregister } from './serviceWorkerRegistration';
 
 ReactDOM.render(
   <React.StrictMode>
@@ -12,4 +12,4 @@ ReactDOM.render(
   document.getElementById('root'),
 );
 
-// register();
+unregister();
