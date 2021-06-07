@@ -43,6 +43,7 @@ const DropDown = styled.div<{ open: boolean }>`
   justify-content: flex-start;
 
   overflow: auto;
+  scrollbar-width: thin;
 
   background-color: var(--frg);
   color: var(--txt);
