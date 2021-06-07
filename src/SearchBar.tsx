@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import DayPicker from 'react-day-picker';
 import styled from 'styled-components';
 import { useGoogleAPI } from './auth';
 import {
@@ -8,7 +9,7 @@ import {
   option,
   SEARCH_TAB_PREFIX,
 } from './config';
-import { getValidURL, HomeDatePicker, partial, useAddTask } from './utils';
+import { getValidURL, useAddTask } from './utils';
 
 const SearchInput = styled.input`
   margin: 0px 2px 2px 2px;
@@ -41,8 +42,8 @@ const SearchInput = styled.input`
   }
 `;
 
-const SearchDatePicker = styled(HomeDatePicker)`
-  display: none !important;
+const SearchDatePicker = styled(DayPicker)<{ open: boolean }>`
+  display: ${(props) => (props.open ? 'default' : 'none')} !important;
 `;
 
 export default function SearchBar({
@@ -92,6 +93,12 @@ export default function SearchBar({
     };
   }, [updateTitle]);
 
+  useEffect(() => {
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') setPickerOpen(false);
+    });
+  });
+
   return (
     <>
       <form
@@ -131,20 +138,15 @@ export default function SearchBar({
         />
       </form>
       <SearchDatePicker
-        variant="dialog"
-        autoOk
-        okLabel={<></>}
-        cancelLabel={<></>}
-        value={new Date()}
+        selectedDays={new Date()}
         open={pickerOpen}
-        onChange={() => {}}
-        onAccept={(d) => {
+        onDayClick={(d) => {
           if (taskText !== null && d) {
             addTask({ title: taskText, due: d.toISOString() });
             setText('');
           }
+          setPickerOpen(false);
         }}
-        onClose={partial(setPickerOpen, false)}
       />
     </>
   );

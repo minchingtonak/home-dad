@@ -1,115 +1,10 @@
 import { ReactElement, useCallback, useEffect, useState } from 'react';
 import update from 'immutability-helper';
 import styled from 'styled-components';
-import dayjs from 'dayjs';
+import { TaskEntry } from './TaskEntry';
 import { Task, TaskList, TASK_UPDATE_DELAY } from './config';
-import {
-  HomeCheckbox,
-  HomeDatePicker,
-  HomeMaterialInput,
-  partial,
-  useAddTask,
-} from './utils';
+import { partial, useAddTask } from './utils';
 import { useGoogleAPI } from './auth';
-
-const TaskEntryDiv = styled.div`
-  margin: 0 5px 5px 5px;
-  padding: 0 0 10px 0;
-
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-
-  background-color: var(--hdr);
-
-  color: var(--txt);
-`;
-
-const TaskDescInput = styled(HomeMaterialInput)`
-  // margin: 10px 10px 10px 7px;
-
-  font-size: large;
-`;
-
-const TaskUIDiv = styled.div`
-  padding-top: 3px;
-
-  display: flex;
-  flex-direction: column;
-`;
-
-const TrashIcon = styled.i.attrs({ className: 'far fa-trash-alt fa-lg' })`
-  padding: 10px;
-
-  transform: scale(0.96);
-
-  color: var(--htx);
-
-  &:hover {
-    color: var(--txt);
-  }
-`;
-
-const DueDateDiv = styled.div`
-  margin-right: 0;
-
-  display: flex;
-  align-content: flex-start;
-  align-items: center;
-`;
-
-const DueIcon = styled.i.attrs({ className: 'far fa-clock' })`
-  margin: 5px 5px 5px 4px;
-  color: var(--htx);
-`;
-
-const TaskDatePicker = styled(HomeDatePicker)`
-  transform: scale(0.88) translateX(-13px);
-`;
-
-function TaskEntry({
-  task,
-  setTask,
-  setChecked,
-  setDeleted,
-}: {
-  task: Task;
-  setTask: (t: Partial<Task>) => void;
-  setChecked: () => void;
-  setDeleted: () => void;
-}) {
-  return (
-    <TaskEntryDiv className="taskentry">
-      <HomeCheckbox
-        checked={task.completed !== undefined}
-        onChange={setChecked}
-      />
-      <TaskUIDiv>
-        <TaskDescInput
-          value={task.title}
-          error={task.title === ''}
-          placeholder="Description cannot be empty"
-          onChange={(e) => setTask({ title: e.target.value })}
-        />
-        <DueDateDiv>
-          <DueIcon />
-          <TaskDatePicker
-            variant="inline"
-            autoOk
-            // IDK why the offset here isn't the same as the native tasks clients
-            value={task.due ? dayjs(task.due).add(12, 'hour') : null}
-            format={'dddd, MMM D'}
-            onAccept={(d) => {
-              setTask({ due: d?.toISOString() });
-            }}
-            onChange={() => {}}
-          />
-        </DueDateDiv>
-      </TaskUIDiv>
-      <TrashIcon onClick={setDeleted} />
-    </TaskEntryDiv>
-  );
-}
 
 const CompletedTasksDiv = styled.div`
   padding: 5px;
@@ -192,7 +87,7 @@ const TasksListDiv = styled.div`
   width: 100%;
   padding-top: 5px;
 
-  overflow: auto;
+  overflow: visible;
 
   background-color: var(--frg);
 
@@ -201,7 +96,7 @@ const TasksListDiv = styled.div`
 `;
 
 const NoTasksText = styled.p`
-  margin: 20px 5px;
+  margin: 20px 80px;
 `;
 
 export function TasksList({
@@ -417,7 +312,7 @@ export function TasksList({
       </>
     );
   } else {
-    body = <p>Use /login to log into Tasks</p>;
+    body = <NoTasksText>Use /login to log into Tasks</NoTasksText>;
   }
 
   return <TasksListDiv id="taskslist">{body}</TasksListDiv>;

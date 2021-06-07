@@ -3,6 +3,8 @@
   --hdr: hsl(calc(var(--base) - 1), 21%, 13%); /* Header Background Color */
   --bkg: hsl(var(--base), 20%, 9%); /* Background Color */
   --frg: hsl(var(--base), 20%, 17%); /* Foreground Color */
+  --frg-l: hsl(var(--base), 20%, 22%); /* Light Foreground Color */
+  --frg-ll: hsl(var(--base), 20%, 28%);
   --hgl: hsl(calc(var(--base) - 10), 100%, 40%); /* Highlight Color */
 
   --htx: #666; /* Header Text Color */
@@ -115,14 +117,14 @@ div#bottom-link-wrapper {
 
 @media only screen and (max-width: 1175px) {
   .top-link {
-    font-size: 13px;
+    font-size: 18px;
   }
 
   .left-corner {
-    top: 2px;
+    top: 10px;
   }
 
   .right-corner {
-    top: 2px;
+    top: 10px;
   }
 }

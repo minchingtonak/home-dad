@@ -8,7 +8,6 @@ import { TasksBar } from './TasksBar';
 import { TasksList } from './TasksList';
 
 const TasksMainDiv = styled.div`
-  width: var(--section-width);
   height: var(--homesearch-height);
 
   display: flex;
@@ -17,7 +16,7 @@ const TasksMainDiv = styled.div`
   @media screen and (max-width: 608px) {
     & {
       height: min-content;
-      margin: 0 0 60px 0;
+      margin: 60px 0;
     }
   }
 `;

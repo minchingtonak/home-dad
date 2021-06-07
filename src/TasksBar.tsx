@@ -19,11 +19,14 @@ const TasksBarDiv = styled.div`
 `;
 
 const TaskListChooserButton = styled.i.attrs({ className: 'fas fa-bars' })`
-  padding: 5px 15px 5px 5px;
+  padding: 7px 12px 8px 5px;
 
-  background-color: var(--hdr);
-  color: var(--txt);
   font-size: 1.2em;
+  color: var(--frg-l);
+
+  &:hover {
+    color: var(--frg-ll);
+  }
 `;
 
 const TasksBarText = styled.span`
@@ -31,9 +34,9 @@ const TasksBarText = styled.span`
 `;
 
 const DropDown = styled.div<{ open: boolean }>`
-  max-height: ${(props) => (props.open ? `500px` : '0')};
+  max-height: ${(props) => (props.open ? `1000px` : '0')};
   transition: max-height
-    ${(props) => (props.open ? '0.25s ease-in' : '0.15s ease-out')};
+    ${(props) => (props.open ? '0.35s ease-in' : '0.25s ease-out')};
 
   display: flex;
   flex-direction: column;
@@ -74,7 +77,7 @@ export function TasksBar({
           <></>
         )}
         <TasksBarText>
-          {loggedIn && activeList.title ? `Tasks - ${activeList.title}` : 'Tasks'}
+          {loggedIn && activeList.title ? `Tasks - ${activeList.title}` : 'Tasks - Not logged in'}
         </TasksBarText>
       </TasksBarDiv>
       <DropDown open={open}>

@@ -16,15 +16,8 @@ export type option<T> = T | null;
 
 export type Sites = { [k: string]: { [k: string]: string } };
 
-// export type TaskLinks = Required<gapi.client.Tasks.Schema.TaskLinks>;
-// export type TaskList = Required<gapi.client.Tasks.Schema.TaskList>;
-// export type TaskLists = Required<gapi.client.Tasks.Schema.TaskLists>;
-// export type Tasks = Required<gapi.client.Tasks.Schema.Tasks>;
-// export type Task = Required<gapi.client.Tasks.Schema.Task>;
-// export type Task = Required<gapi.client.Tasks.Schema.Task>;
-
-export interface TaskLinks extends gapi.client.Tasks.Schema.TaskLinks {}
-export interface TaskList extends gapi.client.Tasks.Schema.TaskList {}
-export interface TaskLists extends gapi.client.Tasks.Schema.TaskLists {}
-export interface Tasks extends gapi.client.Tasks.Schema.Tasks {}
+export type TaskLinks = gapi.client.Tasks.Schema.TaskLinks;
+export type TaskList = gapi.client.Tasks.Schema.TaskList;
+export type TaskLists = gapi.client.Tasks.Schema.TaskLists;
+export type Tasks = gapi.client.Tasks.Schema.Tasks;
 export type Task = gapi.client.Tasks.Schema.Task;
