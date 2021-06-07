@@ -87,7 +87,7 @@ const TasksListDiv = styled.div`
   width: 100%;
   padding-top: 5px;
 
-  overflow: visible;
+  overflow: hidden scroll;
 
   background-color: var(--frg);
 
