@@ -53,7 +53,7 @@ const StaticLink = styled.a`
 `;
 
 export default function StaticLinks() {
-  const links = ['Spotify', 'Slack', 'Steam'];
+  const links = ['Spotify'];
 
   return (
     <StaticLinksContainer id="static-links">
