@@ -3,8 +3,8 @@ import { gapi } from 'gapi-script';
 import { useCached, useLogin } from './utils';
 
 const CLIENT_ID =
-  '529992368744-omh87l4imgosp83f9l67toav9rgl2bru.apps.googleusercontent.com';
-const API_KEY = 'AIzaSyBZJJOMt3MkTKNiTgX8lRAkRx8Nd0A8lTc';
+  '';
+const API_KEY = '';
 
 const TASKS_DISCOVERY_DOCS = [
   'https://www.googleapis.com/discovery/v1/apis/tasks/v1/rest',
